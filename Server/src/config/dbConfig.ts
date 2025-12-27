@@ -15,10 +15,10 @@ type DataBase = {
 }
 
 const dbConfig : DataBase = {
-      host : process.env.DB_HOST || 'localhost',
+      host : process.env.DB_HOST || '',
       user : process.env.DB_USER || 'root',
       password : process.env.DB_PASSWORD || '',
-      db : process.env.DB_NAME || 'merntwoecsite',
+      db : process.env.DB_NAME || '',
       // port: 3306,  // localhost port
       // port: 59867,   // production
       dialect : 'mysql',
