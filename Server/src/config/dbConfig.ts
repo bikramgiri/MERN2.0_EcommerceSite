@@ -16,11 +16,9 @@ type DataBase = {
 
 const dbConfig : DataBase = {
       host : process.env.DB_HOST || '',
-      user : process.env.DB_USER || 'root',
+      user : process.env.DB_USER || '',
       password : process.env.DB_PASSWORD || '',
       db : process.env.DB_NAME || '',
-      // port: 3306,  // localhost port
-      // port: 59867,   // production
       dialect : 'mysql',
       pool : {
             max : 5,
