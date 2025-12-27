@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from "../database/models/userModel";
+import bcrypt from "bcrypt";
 
 class AuthController {
   public static async registerUser(req: Request, res: Response): Promise<void> {
@@ -58,9 +59,9 @@ class AuthController {
 
     try {
       const newUser = await User.create({
-        username,
-        email,
-        password,
+        username: username,
+        email: email,
+        password: bcrypt.hashSync(password, 8),
       });
 
       res.status(201).json({
