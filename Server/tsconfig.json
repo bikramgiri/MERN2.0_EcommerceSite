@@ -10,7 +10,8 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
-    "target": "esnext",
+    "target": "ES2022",     // ← better than esnext in most cases
+    // "target": "esnext",
     "types": [],
     // For nodejs:
     // "lib": ["esnext"],
@@ -35,6 +36,10 @@
     // "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
+    // *Very important for decorators !!!
+    "experimentalDecorators": true,         // ← classic decorators (required)
+    "emitDecoratorMetadata": true,          // ← required for sequelize-typescript
+    
     "strict": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": false,
