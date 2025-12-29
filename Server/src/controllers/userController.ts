@@ -1,24 +1,16 @@
 import { Request, Response } from "express";
 import User from "../database/models/userModel";
 import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken';
 
 class AuthController {
+  // *User Registration
   public static async registerUser(req: Request, res: Response): Promise<void> {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
       res.status(400).json({
         message: "Please provide username, email and password",
-      });
-      return;
-    }
-
-    // validate if user already exists
-    const existingUser = await User.findOne({ where: { email } });
-
-    if (existingUser) {
-      res.status(409).json({
-        message: "User with this email already exists",
       });
       return;
     }
@@ -66,6 +58,51 @@ class AuthController {
 
       res.status(201).json({
         message: "User registered successfully",
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        message: "Something went wrong",
+      });
+    }
+  }
+  
+  // *User Login
+  public static async loginUser(req: Request, res: Response): Promise<void> {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400).json({
+        message: "Please provide email and password",
+      });
+      return;
+    }
+
+    try {
+      // Check if user exists
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        res.status(404).json({
+          message: "User not found",
+        });
+        return;
+      }
+
+      // Validate password
+      const passwordIsValid = bcrypt.compareSync(password, user.password);
+      if (!passwordIsValid) {
+        res.status(401).json({
+          message: "Invalid email or password",
+        });
+        return;
+      }
+
+      // Generate JWT token 
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+        expiresIn: "1d", // Token valid for 1 day
+      });
+
+      res.status(200).json({
+        message: "Login successful",
+        data: token,
       });
     } catch (error: any) {
       res.status(500).json({
