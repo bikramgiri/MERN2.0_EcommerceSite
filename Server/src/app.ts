@@ -10,19 +10,24 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 // *Database connection
-// require('./model/index');
-// require('./database/connection');
-//or
 import './database/connection';
+
+// *Admin Seeder
+import adminSeeder from './adminSeeder';
+adminSeeder();
 
 //*Routes
 import userRoute from './routes/userRoute';
+import productRoute from './routes/productRoute';
 
-app.get('/', (req:Request, res:Response) => {
-  res.send('E-Commerce Site Server is running');
-});
+// *Give access to storage folder images
+app.use("/src/storage", express.static("storage")); // Serve static files from the storage directory
+// or
+// give access to images in storage folder
+// app.use(express.static('storage'))
 
-app.use('/users', userRoute);
+app.use('/auth', userRoute);
+app.use('/admin', productRoute);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
