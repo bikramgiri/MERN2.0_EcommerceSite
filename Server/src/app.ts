@@ -19,6 +19,7 @@ adminSeeder();
 //*Routes
 import userRoute from './routes/userRoute';
 import productRoute from './routes/productRoute';
+import categoryController from './controllers/categoryController';
 
 // *Give access to storage folder images
 app.use("/src/storage", express.static("storage")); // Serve static files from the storage directory
@@ -31,5 +32,6 @@ app.use('/admin', productRoute);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
+  categoryController.seedCategory();
   console.log(`Server is running on port ${PORT}`);
 });

@@ -1,4 +1,7 @@
 import {Sequelize} from 'sequelize-typescript';
+import User from './models/userModel';
+import Product from './models/productModel';
+import Category from './models/categoryModel';
 
 const sequelize = new Sequelize({
       database : process.env.DB_NAME as string,
@@ -19,12 +22,22 @@ sequelize.authenticate()
       })
 
 sequelize
-  .sync({ force: false })
+  .sync({ force: false, alter: true })
   .then(() => {
     console.log('Models synced successfully!');
   })
   .catch((err) => {
     console.error('Sync failed:', err);
   });
+
+// *Relationships between models
+// User.hasMany(Product)
+// Product.belongsTo(User)
+// or
+User.hasMany(Product, { foreignKey: 'userId' });
+Product.belongsTo(User, { foreignKey: 'userId' });
+
+Product.belongsTo(Category, { foreignKey: 'categoryId' });
+Category.hasOne(Product, { foreignKey: 'categoryId' });
 
 export default sequelize;

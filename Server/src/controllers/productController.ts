@@ -1,14 +1,18 @@
 import { Request, Response } from "express";
 import Product from "../database/models/productModel";
+import { AuthRequest } from "../middleware/authMiddleware";
+import Category from "../database/models/categoryModel";
+import User from "../database/models/userModel";
 
 class ProductController {
   // *Create Product
-  public static async addProduct(req: Request, res: Response): Promise<void> {
+  public static async addProduct(req: AuthRequest, res: Response): Promise<void> {
     try {
+      const userId = req.user?.id;
       const file = req.file;
       if (!file) {
         res.status(400).json({
-          message: "Please upload a product image",
+          message: "Please upload a product image.",
         });
         return;
       }
@@ -21,6 +25,7 @@ class ProductController {
         productDescription,
         productPrice,
         productTotalStockQty,
+        categoryId
       } = req.body;
 
       // validate required fields
@@ -28,10 +33,11 @@ class ProductController {
         !productName ||
         !productDescription ||
         !productPrice ||
-        !productTotalStockQty
+        !productTotalStockQty ||
+        !categoryId
       ) {
         res.status(400).json({
-          message: "Please provide all required fields",
+          message: "Please provide productName, productDescription, productPrice, productTotalStockQty, and categoryId.",
         });
         return;
       }
@@ -90,20 +96,52 @@ class ProductController {
 
       const newProduct = await Product.create({
         productName: productName,
-        productImage: productImage,
+        productImage: fileName,
         productPrice: productPrice,
         productTotalStockQty: productTotalStockQty,
         productDescription: productDescription,
+        userId: userId,
+        categoryId: categoryId
       });
       res.status(201).json({
         message: "Product created successfully",
         data: newProduct,
-        //   product: {
-        //     ...newProduct.get({ plain: true }),
-        //     productImage: productImage,         // ← full URL for client
-        //   },
+          product: {
+            ...newProduct.get({ plain: true }),
+            productImage: productImage,         // ← full URL for client
+          },
       });
     } catch (error: any) {
+      res.status(500).json({
+        message: "Something went wrong",
+        error: error.message,
+      });
+    }
+  }
+  
+  // *Get All Products
+  public static async getAllProducts(req: Request, res: Response): Promise<void> {
+    try {
+      const products = await Product.findAll(
+        {
+          include: [
+            {
+              model: Category,
+              attributes: ['id', 'categoryName']
+            },
+            {
+              model: User,
+              attributes: ['id', 'username', 'email']
+            }
+          ]
+        }
+      );
+      res.status(200).json({
+        message: "Products fetched successfully",
+        data: products,
+      });
+    }
+    catch (error: any) {
       res.status(500).json({
         message: "Something went wrong",
         error: error.message,

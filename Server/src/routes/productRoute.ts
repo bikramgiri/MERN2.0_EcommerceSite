@@ -8,4 +8,7 @@ const router:Router = express.Router();
 router.route('/product')
 .post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), (upload.single('productImage')), ProductController.addProduct);
 
+router.route('/products')
+.get(ProductController.getAllProducts);
+
 export default router;
