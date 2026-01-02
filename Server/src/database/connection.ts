@@ -22,7 +22,7 @@ sequelize.authenticate()
       })
 
 sequelize
-  .sync({ force: false, alter: true })
+  .sync({ force: false, alter: false })
   .then(() => {
     console.log('Models synced successfully!');
   })

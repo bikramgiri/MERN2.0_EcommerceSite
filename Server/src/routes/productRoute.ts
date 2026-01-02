@@ -6,9 +6,12 @@ import authMiddleware, { Role } from '../middleware/authMiddleware';
 const router:Router = express.Router();
 
 router.route('/product')
-.post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), (upload.single('productImage')), ProductController.addProduct);
+.post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), (upload.single('productImage')), catchAsyncError(ProductController.addProduct))
+.get(catchAsyncError(ProductController.getAllProducts));
 
-router.route('/products')
-.get(ProductController.getAllProducts);
+router.route('/product/:id')
+.get(catchAsyncError(ProductController.getSingleProduct))
+.patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), (upload.single('productImage')), catchAsyncError(ProductController.updateProduct))
+.delete(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), catchAsyncError(ProductController.deleteProduct));
 
 export default router;

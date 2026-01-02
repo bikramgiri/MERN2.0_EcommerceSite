@@ -19,6 +19,7 @@ adminSeeder();
 //*Routes
 import userRoute from './routes/userRoute';
 import productRoute from './routes/productRoute';
+import categoryRoute from './routes/categoryRoute';
 import categoryController from './controllers/categoryController';
 
 // *Give access to storage folder images
@@ -29,6 +30,7 @@ app.use("/src/storage", express.static("storage")); // Serve static files from t
 
 app.use('/auth', userRoute);
 app.use('/admin', productRoute);
+app.use('/admin', categoryRoute);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
