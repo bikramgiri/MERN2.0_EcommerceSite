@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import User from "../database/models/userModel";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
+import User from "../../models/userModel";
 
 class AuthController {
   // *User Registration

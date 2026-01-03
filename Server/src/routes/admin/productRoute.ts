@@ -1,8 +1,8 @@
 import express, {Router} from 'express';
-import catchAsyncError from '../services/catchAsyncError';
-import ProductController from '../controllers/productController';
-import { upload } from '../middleware/multerMiddleware';
-import authMiddleware, { Role } from '../middleware/authMiddleware';
+import catchAsyncError from '../../services/catchAsyncError';
+import ProductController from '../../controllers/admin/product/productController';
+import { upload } from '../../middleware/multerMiddleware';
+import authMiddleware, { Role } from '../../middleware/authMiddleware';
 const router:Router = express.Router();
 
 router.route('/product')

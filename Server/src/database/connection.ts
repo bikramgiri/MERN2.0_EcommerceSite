@@ -1,7 +1,8 @@
 import {Sequelize} from 'sequelize-typescript';
-import User from './models/userModel';
-import Product from './models/productModel';
-import Category from './models/categoryModel';
+import User from '../models/userModel';
+import Product from '../models/productModel';
+import Category from '../models/categoryModel';
+import Cart from '../models/cartModel';
 
 const sequelize = new Sequelize({
       database : process.env.DB_NAME as string,
@@ -10,7 +11,7 @@ const sequelize = new Sequelize({
       password : process.env.DB_PASSWORD as string,
       host : process.env.DB_HOST as string,
       port : Number(process.env.DB_PORT),
-      models: [__dirname + '/models']
+      models: [__dirname + '/../models']
 });
 
 sequelize.authenticate()
@@ -38,6 +39,12 @@ User.hasMany(Product, { foreignKey: 'userId' });
 Product.belongsTo(User, { foreignKey: 'userId' });
 
 Product.belongsTo(Category, { foreignKey: 'categoryId' });
-Category.hasOne(Product, { foreignKey: 'categoryId' });
+Category.hasMany(Product, { foreignKey: 'categoryId' });
+
+Cart.belongsTo(Product, { foreignKey: 'productId' });
+Product.hasMany(Cart, { foreignKey: 'productId' });
+
+Cart.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Cart, { foreignKey: 'userId' });
 
 export default sequelize;

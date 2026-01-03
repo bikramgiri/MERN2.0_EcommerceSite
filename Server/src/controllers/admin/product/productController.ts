@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import Product from "../database/models/productModel";
-import { AuthRequest } from "../middleware/authMiddleware";
-import Category from "../database/models/categoryModel";
-import User from "../database/models/userModel";
+import Product from "../../../models/productModel";
+import { AuthRequest } from "../../../middleware/authMiddleware";
+import Category from "../../../models/categoryModel";
+import User from "../../../models/userModel";
 const fs = require("fs");
 
 class ProductController {
@@ -274,7 +274,7 @@ class ProductController {
           }
         });
         // productImage = `${process.env.BACKEND_URL_STORAGE}` + req.file.filename;
-        productImage = product.productImage;
+        productImage = req.file.filename; // just store filename in DB
       }
 
       const updatedProduct = await product.update({

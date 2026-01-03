@@ -1,4 +1,4 @@
-import User from "./database/models/userModel";
+import User from "./models/userModel";
 import bcrypt from "bcrypt";
 
 const adminSeeder = async () => {
