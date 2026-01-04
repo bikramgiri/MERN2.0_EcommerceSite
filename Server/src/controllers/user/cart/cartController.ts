@@ -3,6 +3,7 @@ import { AuthRequest } from "../../../middleware/authMiddleware";
 import Cart from "../../../models/cartModel";
 import Product from "../../../models/productModel";
 import User from "../../../models/userModel";
+import Category from "../../../models/categoryModel";
 
 class CartController {
   // *Add to Cart
@@ -52,7 +53,6 @@ class CartController {
       await existingCartItem.save();
     } else {
       // if not exists, create a new cart item
-
       const newCartItem = await Cart.create({
         userId: userId!,
         productId,
@@ -79,10 +79,17 @@ class CartController {
 
     const cartItems = await Cart.findAll({
       where: { userId },
+      attributes: ["id", "quantity", "productName", "productPrice", "productTotalStockQty"],
       include: [
         {
           model: Product,
           attributes: ["id", "productName", "productPrice", "productTotalStockQty"],
+          include: [
+            {
+              model: Category,
+              attributes: ["id", "categoryName"],
+            },
+          ],
         },
         {
           model: User,
@@ -115,6 +122,7 @@ class CartController {
 
     const cartItem = await Cart.findOne({
       where: { userId },
+      attributes: ["id", "quantity", "productName", "productPrice", "productTotalStockQty"],
       include: [
         {
           model: Product,
@@ -172,7 +180,7 @@ class CartController {
       return;
     }
 
-    const cartItem = await Cart.findOne({ where: { userId } });
+    const cartItem = await Cart.findOne({ where: { userId, productId } });
     if (!cartItem) {
       res.status(404).json({
         message: "Cart item not found",
@@ -198,7 +206,24 @@ class CartController {
       return;
     }
 
-    const cartItem = await Cart.findOne({ where: { userId } });
+    const productId = req.params.id;
+    if (!productId) {
+      res.status(400).json({
+        message: "Please provide productId",
+      });
+      return;
+    }
+
+    // check whether the product exists in the cart or not
+    const existingProduct = await Cart.findByPk(productId);
+    if (!existingProduct) {
+      res.status(404).json({
+        message: "Product not found in cart",
+      });
+      return;
+    }
+
+    const cartItem = await Cart.findOne({ where: { userId, productId } });
     if (!cartItem) {
       res.status(404).json({
         message: "Cart item not found",
