@@ -21,6 +21,7 @@ import authRoute from './routes/auth/authRoute';
 import productRoute from './routes/admin/productRoute';
 import categoryRoute from './routes/admin/categoryRoute';
 import cartRoute from './routes/user/cartRoute';
+import orderRoute from './routes/user/orderRoute';
 import categoryController from './controllers/admin/category/categoryController';
 
 // *Give access to storage folder images
@@ -33,6 +34,7 @@ app.use('/auth', authRoute);
 app.use('/admin', productRoute);
 app.use('/admin', categoryRoute);
 app.use('/user', cartRoute);
+app.use('/user', orderRoute);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {

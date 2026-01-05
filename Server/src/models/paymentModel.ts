@@ -36,7 +36,8 @@ class Payment extends Model {
 
       @Column({
             type : DataType.STRING,
-            allowNull : false
+            // set null if not paid via online method
+            // allowNull : false
       })
       declare pidx : string;
 }

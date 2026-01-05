@@ -74,4 +74,8 @@ Product.hasMany(OrderDetail, { foreignKey: "productId" });
 Order.belongsTo(Payment, { foreignKey: "paymentId" });
 Payment.hasOne(Order, { foreignKey: "paymentId" });
 
+// User and order relationship
+Order.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Order, { foreignKey: "userId" });
+
 export default sequelize;
