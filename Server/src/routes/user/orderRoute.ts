@@ -7,4 +7,7 @@ const router:Router = express.Router();
 router.route('/order')
 .post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), orderController.createOrder)
 
+router.route('/verifypidx')
+.post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), orderController.verifyPidx);
+
 export default router;

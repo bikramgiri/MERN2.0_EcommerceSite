@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthRequest } from "../../../middleware/authMiddleware";
-import { OrderDetails, PaymentMethod, KhaltiResponse } from '../../../types/orderTypes';
+import { OrderDetails, PaymentMethod, KhaltiResponse, TransactionVerificationResponse, TransactionStatus, PaymentStatus } from '../../../types/orderTypes';
 import Order from "../../../models/orderModel";
 import Payment from "../../../models/paymentModel";
 import OrderDetail from "../../../models/orderDetailsModel";
@@ -129,6 +129,55 @@ class OrderController {
         order: newOrder,
       });
     } catch (err) {
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  }
+
+  async verifyPidx(req: AuthRequest, res: Response): Promise<void> {
+    const { pidx } = req.body;
+    if (!pidx) {
+      res.status(400).json({
+        message: "pidx is required",
+      });
+      return;
+    }
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        message: "User not authenticated",
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${process.env.KHALTI_PIDX_TEST}`,{pidx: pidx},{
+            headers: {
+              Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
+            }
+          }
+      );
+
+      const data: TransactionVerificationResponse = response.data;
+      if(data.status ===  TransactionStatus.Completed){
+            await Payment.update(
+                  { paymentStatus: PaymentStatus.Paid },
+                  { where: { pidx: pidx } }
+            );
+
+            res.status(200).json({
+                  message: "Payment verified successfully",
+                  data: data
+            });
+            return;
+          } else {
+            res.status(400).json({
+                  message: "Payment not completed",
+                  data: data
+            });
+        } 
+      }catch (err) {
       res.status(500).json({
         message: "Internal server error",
       });
