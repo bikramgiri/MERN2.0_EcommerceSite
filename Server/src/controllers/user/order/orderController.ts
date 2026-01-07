@@ -1,10 +1,11 @@
 import { Response } from "express";
 import { AuthRequest } from "../../../middleware/authMiddleware";
-import { OrderDetails, PaymentMethod, KhaltiResponse, TransactionVerificationResponse, TransactionStatus, PaymentStatus } from '../../../types/orderTypes';
+import { OrderDetails, PaymentMethod, KhaltiResponse, TransactionVerificationResponse, TransactionStatus, PaymentStatus, OrderStatus } from '../../../types/orderTypes';
 import Order from "../../../models/orderModel";
 import Payment from "../../../models/paymentModel";
 import OrderDetail from "../../../models/orderDetailsModel";
 import axios from "axios";
+import Product from "../../../models/productModel";
 
 class OrderController {
   async createOrder(req: AuthRequest, res: Response): Promise<void> {
@@ -135,7 +136,7 @@ class OrderController {
     }
   }
 
-  async verifyPidx(req: AuthRequest, res: Response): Promise<void> {
+  async paymentVerify(req: AuthRequest, res: Response): Promise<void> {
     const { pidx } = req.body;
     if (!pidx) {
       res.status(400).json({
@@ -182,6 +183,144 @@ class OrderController {
         message: "Internal server error",
       });
     }
+  }
+
+  // *Fetch orders
+  async fetchMyOrders(req: AuthRequest, res: Response): Promise<void> {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        message: "User not authenticated",
+      });
+      return;
+    }
+
+    try {
+      const orders = await Order.findAll({
+        where: { userId },
+        include: [
+          {
+            model: Payment,
+            attributes: ['paymentMethod', 'paymentStatus', 'pidx']
+          }
+        ]
+      });
+      if(orders.length === 0){
+            res.status(404).json({
+                  message: "No orders found for this user"
+            });
+            return;
+      }
+      res.status(200).json({
+        message: "Orders fetched successfully",
+        data: orders,
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  }
+
+  // *Fetch Order Detais
+  async fetchOrderDetails(req: AuthRequest, res: Response): Promise<void> {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        message: "User not authenticated",
+      });
+      return;
+    }
+
+    const orderId = req.params.id;
+    if (!orderId) {
+      res.status(400).json({
+        message: "Order ID is required",
+      });
+      return;
+    }
+
+    try {
+      const orderDetails = await OrderDetail.findAll({
+        where: { orderId },
+        include : [
+          {
+            model : Product,
+            attributes : ["productName", "productPrice", "productDescription"]
+          }
+        ]
+      });
+
+      if (orderDetails.length === 0) {
+        res.status(404).json({
+          message: "Order details not found",
+        });
+        return;
+      }
+
+      res.status(200).json({
+        message: "Order details fetched successfully",
+        data: orderDetails,
+      });
+  }catch (err) {
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  }
+
+  // *Cancel Orders
+  async cancelMyOrder(req:AuthRequest, res:Response): Promise<void> {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        message: "User not authenticated",
+      });
+      return;
+    }
+    const orderId = req.params.id;
+    if (!orderId) {
+      res.status(400).json({
+        message: "Order ID is required",
+      });
+      return;
+    }
+
+    // try {
+      const order = await Order.findByPk(orderId);
+      if (!order) {
+        res.status(404).json({
+          message: "Order not found",
+        });
+        return;
+      }
+
+      if (order.orderStatus === "In Transit" || order.orderStatus === "Preparation" || order.orderStatus === "Delivered") {
+        res.status(400).json({
+          message: `Order cannot be cancelled as it is already ${order.orderStatus}`,
+        });
+        return;
+      }
+      
+      // Cancel only if status is Pending
+      // if (order.orderStatus === "Pending") {
+      //       order.orderStatus = "Cancelled";
+      //       await order.save();
+      // }
+      
+      // *Or
+
+      // Cancel the order
+      await order.update({ orderStatus: OrderStatus.Cancelled }, { where: { id: orderId } }); 
+
+      res.status(200).json({
+        message: "Order cancelled successfully",
+      });
+    // } catch (err) {
+    //   res.status(500).json({
+    //     message: "Internal server error",
+    //   });
+    // }
   }
 }
 
