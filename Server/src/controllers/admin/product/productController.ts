@@ -3,6 +3,9 @@ import Product from "../../../models/productModel";
 import { AuthRequest } from "../../../middleware/authMiddleware";
 import Category from "../../../models/categoryModel";
 import User from "../../../models/userModel";
+import Order from "../../../models/orderModel";
+import Payment from "../../../models/paymentModel";
+import OrderDetail from "../../../models/orderDetailsModel";
 const fs = require("fs");
 
 class ProductController {
@@ -338,6 +341,101 @@ class ProductController {
       res.status(500).json({
         message: "Something went wrong",
         error: error.message,
+      });
+    }
+  }
+
+  // *Fetch Orders of a Product
+  public static async fetchProductOrders( req: Request, res: Response): Promise<void> {
+    const productId = req.params.id;
+    if (!productId) {
+      res.status(400).json({ message: 'Product ID is required' });
+      return;
+    }
+
+    try {
+      const productOrders = await Product.findAll({
+        where: { id: productId },
+        attributes: ['id', 'productName', 'productPrice', 'productDescription', 'productImage', 'productTotalStockQty'],
+        include: [  
+          { 
+            model: OrderDetail, 
+            attributes: ['id', 'quantity'],
+            include: [
+              { 
+                model: Order,
+                attributes: ['id', 'orderStatus', 'totalAmount', 'shippingAddress', 'phoneNumber'],
+                include: [
+                  {
+                    model: User,
+                    attributes: ['id', 'username', 'email']
+                  },
+                  {
+                    model: Payment,
+                    attributes: ['id', 'paymentMethod', 'paymentStatus']
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      });
+
+     
+      if (!productOrders) {
+        res.status(404).json({ message: 'No orders found for this product' });
+        return;
+      }
+
+      res.status(200).json({ 
+        message: 'Orders fetched successfully', 
+        data: productOrders,
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        message: 'Internal server error' 
+      });
+    }
+  }
+
+  // *Update Stock Quantity of a Product
+  public static async updateProductStockQty( req: Request, res: Response): Promise<void> {
+    const productId = req.params.id;
+    if (!productId) {
+      res.status(400).json({ message: 'Product ID is required' });
+      return;
+    }
+    try {
+    const { productTotalStockQty } = req.body;
+    // validate productTotalStockQty must be a number >= 0
+    const stockQty = Number(productTotalStockQty);
+    if (isNaN(stockQty) || stockQty < 0) {
+      res.status(400).json({
+        message: "Product stock quantity must be a number >= 0",
+      });
+      return;
+    }
+
+    // Check if product exists
+    const product = await Product.findByPk(productId);
+    if (!product) {
+      res.status(404).json({ message: 'Product not found' });
+      return;
+    }
+
+    const updatedProductTotalStockQty = await product.update({ productTotalStockQty: stockQty });
+    if (!updatedProductTotalStockQty) {
+      res.status(500).json({ message: 'Failed to update product stock quantity' });
+      return;
+    }
+
+    res.status(200).json({ 
+      message: 'Product stock quantity updated successfully', 
+      data: updatedProductTotalStockQty 
+    });
+  } catch (error) {
+      res.status(500).json({ 
+        message: 'Internal server error' 
       });
     }
   }

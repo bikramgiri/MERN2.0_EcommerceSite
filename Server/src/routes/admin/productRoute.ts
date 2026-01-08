@@ -14,4 +14,10 @@ router.route('/product/:id')
 .patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), (upload.single('productImage')), catchAsyncError(ProductController.updateProduct))
 .delete(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), catchAsyncError(ProductController.deleteProduct));
 
+router.route('/productorder/:id')
+.get(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), ProductController.fetchProductOrders)
+
+router.route('/product/productstockqty/:id')
+.patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), catchAsyncError(ProductController.updateProductStockQty));
+
 export default router;

@@ -51,18 +51,19 @@ class CartController {
       // if exists, increase the quantity by 1
       existingCartItem.quantity += 1;
       await existingCartItem.save();
-    } else {
+    } 
+    // else {
       // if not exists, create a new cart item
       const newCartItem = await Cart.create({
         userId: userId!,
         productId,
         quantity,
       });
-    }
+    // }
 
     res.status(201).json({
       message: "Product added to cart successfully",
-      data: existingCartItem,
+      data: newCartItem,
     });
     return;
   }
@@ -79,7 +80,7 @@ class CartController {
 
     const cartItems = await Cart.findAll({
       where: { userId },
-      attributes: ["id", "quantity", "productName", "productPrice", "productTotalStockQty"],
+      // attributes: ["id", "quantity", "productName", "productPrice", "productTotalStockQty"],
       include: [
         {
           model: Product,

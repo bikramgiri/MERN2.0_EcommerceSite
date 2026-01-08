@@ -21,7 +21,8 @@ import authRoute from './routes/auth/authRoute';
 import productRoute from './routes/admin/productRoute';
 import categoryRoute from './routes/admin/categoryRoute';
 import cartRoute from './routes/user/cartRoute';
-import orderRoute from './routes/user/orderRoute';
+import userOrderRoute from './routes/user/userOrderRoute';
+import adminOrderRoute from './routes/admin/adminOrderRoute';
 import categoryController from './controllers/admin/category/categoryController';
 
 // *Give access to storage folder images
@@ -33,8 +34,9 @@ app.use("/src/storage", express.static("storage")); // Serve static files from t
 app.use('/auth', authRoute);
 app.use('/admin', productRoute);
 app.use('/admin', categoryRoute);
+app.use('/admin', adminOrderRoute);
 app.use('/user', cartRoute);
-app.use('/user', orderRoute);
+app.use('/user', userOrderRoute);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
