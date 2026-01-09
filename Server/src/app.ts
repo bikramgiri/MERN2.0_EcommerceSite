@@ -2,8 +2,7 @@
 // or
 import * as dotenv from 'dotenv';
 dotenv.config();
-// import 'reflect-metadata';
-import express, {Application, Request, Response} from 'express';
+import express, {Application} from 'express';
 const app:Application = express();
 
 app.use(express.json());
