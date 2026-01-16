@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { STATUSES } from "../global/statuses";
+import { STATUSES } from "../globals/statuses";
 
 interface User{
       username: string,
