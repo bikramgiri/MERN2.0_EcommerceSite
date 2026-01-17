@@ -14,7 +14,7 @@ const Hero = () => {
 
         <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
-            {/* Left - Text & CTA */}
+            {/* Left */}
             <div className="max-w-2xl text-center lg:text-left">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-indigo-950">
                 Discover products you'll{" "}
@@ -25,7 +25,7 @@ const Hero = () => {
                 Shop the latest trends, unbeatable deals, and everything you need — delivered fast and hassle-free.
               </p>
 
-              {/* CTA Buttons */}
+              {/* Buttons */}
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   to="/products"

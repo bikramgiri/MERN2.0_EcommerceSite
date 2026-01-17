@@ -35,11 +35,23 @@ const Navbar = () => {
 
           {/* Right side actions */}
           <div className="flex items-center gap-5 md:gap-7">
+           {/* Favourite */}
+            {/* <Link
+              to="/favorites"
+              className="relative text-indigo-700 hover:text-indigo-900 transition-colors p-1.5 rounded-full hover:bg-indigo-50"
+            >
+              <Heart className="h-6 w-6" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link> */}
 
             {/* Notifications */}
             <button
               type="button"
-              className="relative text-indigo-700 hover:text-indigo-900 transition-colors p-1.5 rounded-full hover:bg-indigo-50"
+              className="cursor-pointer relative text-indigo-700 hover:text-indigo-900 transition-colors p-1.5 rounded-full hover:bg-indigo-50"
             >
               <span className="sr-only">Notifications</span>
               <Bell className="h-6 w-6" />
