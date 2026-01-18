@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel";
+import { Multer } from "multer";
 
-export interface AuthRequest extends Request {
+ export interface AuthRequest extends Request {
   user?: {
     username: string;
     email: string;
@@ -10,6 +11,8 @@ export interface AuthRequest extends Request {
     role: string;
     id: string;
   };
+  // file?: Express.Multer.File;           // ← Add this
+  // files?: Express.Multer.File[];        // ← Optional: if you allow multiple files
 }
 
 export enum Role{

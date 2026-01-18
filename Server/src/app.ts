@@ -3,10 +3,18 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import express, {Application} from 'express';
+// import './cloudinary/index' // (Optional)
 const app:Application = express();
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
+app.use(cookieParser());
 
 // *Database connection
 import './database/connection';
@@ -26,8 +34,8 @@ import categoryController from './controllers/admin/category/categoryController'
 
 // *Give access to storage folder images
 app.use("/src/storage", express.static("storage")); // Serve static files from the storage directory
-// or
-// give access to images in storage folder
+// *Or
+// *Give access to images in storage folder
 // app.use(express.static('storage'))
 
 app.use('/auth', authRoute);

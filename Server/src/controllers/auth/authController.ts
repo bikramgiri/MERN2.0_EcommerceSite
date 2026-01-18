@@ -78,8 +78,8 @@ class AuthController {
 
     try {
       // Check if user exists
-      const user = await User.findOne({ where: { email } });
-      if (!user) {
+      const userExist = await User.findOne({ where: { email } });
+      if (!userExist) {
         res.status(404).json({
           message: "User not found",
         });
@@ -87,7 +87,7 @@ class AuthController {
       }
 
       // Validate password
-      const passwordIsValid = bcrypt.compareSync(password, user.password);
+      const passwordIsValid = bcrypt.compareSync(password, userExist.password);
       if (!passwordIsValid) {
         res.status(401).json({
           message: "Invalid email or password",
@@ -96,15 +96,36 @@ class AuthController {
       }
 
       // Generate JWT token 
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY as string, {
+      const token = jwt.sign({ id: userExist.id }, process.env.JWT_SECRET_KEY as string, {
         expiresIn: "1d", // Token valid for 1 day
       });
 
-      
+      // Set token as a cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      });
 
       res.status(200).json({
         message: "Login successful",
-        data: token,
+        data: userExist,
+        token: token,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        message: "Something went wrong",
+      });
+    }
+  }
+
+  // *User Logout
+  public static async logoutUser(req: Request, res: Response): Promise<void> {
+    try {
+      res.clearCookie("token");
+      res.status(200).json({
+        message: "Logout successful",
       });
     } catch (error: any) {
       res.status(500).json({

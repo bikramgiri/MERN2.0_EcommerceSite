@@ -6,6 +6,7 @@ import User from "../../../models/userModel";
 import Order from "../../../models/orderModel";
 import Payment from "../../../models/paymentModel";
 import OrderDetail from "../../../models/orderDetailsModel";
+import { cloudinary } from "../../../cloudinary";
 const fs = require("fs");
 
 class ProductController {
@@ -24,8 +25,20 @@ class ProductController {
         return;
       }
 
-      const fileName = file.filename;
-      const productImage = `${process.env.BACKEND_URL}/src/storage/${fileName}`;
+      // *Get Cloudinary result from middleware
+    const cloudinaryResult = (req as any).cloudinaryResult;
+    if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+      res.status(500).json({ message: "Image upload failed" });
+      return;
+    }
+
+    const productImage = cloudinaryResult.secure_url; // full HTTPS URL
+    // const fileName = productImage.substring(productImage.lastIndexOf('/') + 1); // f6g7yfl6zw37eo0327nl.png
+    const fileName = productImage.split('/').pop() || '';
+
+       // *For Multer Storage
+      // const fileName = file.filename;
+      // const productImage = `${process.env.BACKEND_URL}/src/storage/${fileName}`;
 
       const {
         productName,
@@ -115,7 +128,7 @@ class ProductController {
         message: "Product created successfully",
         data: newProduct,
         product: {
-          ...newProduct.get({ plain: true }),
+          // ...newProduct.get({ plain: true }),
           productImage: productImage, // ← full URL for client
         },
       });
@@ -264,25 +277,44 @@ class ProductController {
       //   return;
       // }
 
-      // Update product image only if a new image is uploaded
-      if (req.file && req.file.filename) {
-        const oldProductImage = product.productImage;
-        // const lengthToCut = `${process.env.BACKEND_URL_STORAGE}`.length;
-        // const finalImagePathAfterCut = oldProductImage.slice(lengthToCut);
-        fs.unlink("./src/storage/" + oldProductImage, (err: any) => {
-          if (err) {
-            console.error("Error deleting old image:", err);
+      // *For Multer: update product image only if a new image is uploaded
+      // if (req.file && req.file.filename) {
+      //   const oldProductImage = product.productImage;
+      //   // const lengthToCut = `${process.env.BACKEND_URL_STORAGE}`.length;
+      //   // const finalImagePathAfterCut = oldProductImage.slice(lengthToCut);
+      //   fs.unlink("./src/storage/" + oldProductImage, (err: any) => {
+      //     if (err) {
+      //       console.error("Error deleting old image:", err);
+      //     } else {
+      //       console.log("Old image deleted successfully");
+      //     }
+      //   });
+      //   // productImage = `${process.env.BACKEND_URL_STORAGE}` + req.file.filename;
+      //   productImage = req.file.filename; // just store filename in DB
+      // }
+
+      // *For Cloudinary: update product image only if a new image is uploaded
+      const cloudinaryResult = (req as any).cloudinaryResult;
+      if (cloudinaryResult && cloudinaryResult.secure_url) {
+        // Delete old image from Cloudinary
+        // const oldPublicId = product.productImage.split('.').slice(0, -1).join('.'); // remove file extension
+        const oldProductImage = product.productImage.split('/').pop() || '';
+        cloudinary.uploader.destroy(oldProductImage, (error: any, result: any) => {
+          if (error) {
+            console.error("Error deleting old image from Cloudinary:", error);
           } else {
-            console.log("Old image deleted successfully");
+            console.log("Old image deleted from Cloudinary successfully:", result);
           }
         });
-        // productImage = `${process.env.BACKEND_URL_STORAGE}` + req.file.filename;
-        productImage = req.file.filename; // just store filename in DB
+
+        productImage = cloudinaryResult.secure_url; // update to new image URL
       }
+
+      const finalName = productImage.split('/').pop() || '';
 
       const updatedProduct = await product.update({
         productName: productName,
-        productImage: productImage,
+        productImage: finalName,
         productDescription: productDescription,
         productPrice: productPrice,
         productTotalStockQty: productTotalStockQty,
@@ -291,6 +323,9 @@ class ProductController {
       res.status(200).json({
         message: "Product updated successfully",
         data: updatedProduct,
+        product: {
+          productImage: productImage, // ← full URL for client
+        },
       });
     } catch (error: any) {
       res.status(500).json({
@@ -320,16 +355,27 @@ class ProductController {
         });
         return;
       }
+      
+      // *For Multer Storage: Delete image from Storage folder
+      // const oldProductImage = product.productImage; //AI.jpeg
+      // // const lengthToCut = "http://localhost:4000/src/storage/".length;
+      // // const finalImagePathAfterCut = oldProductImage.slice(lengthToCut);
+      // // Delete the image file from Storage folder
+      // fs.unlink("./src/storage/" + oldProductImage, (err: any) => {
+      //   if (err) {
+      //     console.error("Error deleting image:", err);
+      //   } else {
+      //     console.log("Image deleted successfully");
+      //   }
+      // });
 
-      const oldProductImage = product.productImage; //AI.jpeg
-      // const lengthToCut = "http://localhost:4000/src/storage/".length;
-      // const finalImagePathAfterCut = oldProductImage.slice(lengthToCut);
-      // Delete the image file from Storage folder
-      fs.unlink("./src/storage/" + oldProductImage, (err: any) => {
-        if (err) {
-          console.error("Error deleting image:", err);
+      // *For Cloudinary: Delete image from Cloudinary
+      const ImageName = product.productImage.split('/').pop() || '';
+      cloudinary.uploader.destroy(ImageName, (error: any, result: any) => {
+        if (error) {
+          console.error("Error deleting image from Cloudinary:", error);
         } else {
-          console.log("Image deleted successfully");
+          console.log("Image deleted from Cloudinary successfully:", result);
         }
       });
 
