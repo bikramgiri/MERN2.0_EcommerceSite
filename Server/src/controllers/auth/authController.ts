@@ -11,6 +11,7 @@ class AuthController {
     if (!username || !email || !password) {
       res.status(400).json({
         message: "Please provide username, email and password",
+        field: "general"
       });
       return;
     }
@@ -19,6 +20,7 @@ class AuthController {
     if (username.length < 3) {
       res.status(400).json({
         message: "Username must be at least 3 characters long",
+        field: "username"
       });
       return;
     }
@@ -28,6 +30,7 @@ class AuthController {
     if (!emailRegex.test(email)) {
       res.status(400).json({
         message: "Please provide a valid email address",
+        field: "email"
       });
       return;
     }
@@ -37,14 +40,16 @@ class AuthController {
     if (existingEmail) {
       res.status(409).json({
         message: "User with this email already exists",
+        field: "email"
       });
       return;
     }
 
-    // validate password length must be greater than 8
-    if (password.length < 8) {
+    // validate password length must be at least 6 characters
+    if (password.length < 6) {
       res.status(400).json({
-        message: "Password must be at least 8 characters long",
+        message: "Password must be at least 6 characters long",
+        field: "password"
       });
       return;
     }

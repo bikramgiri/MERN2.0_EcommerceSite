@@ -11,8 +11,6 @@ import { Multer } from "multer";
     role: string;
     id: string;
   };
-  // file?: Express.Multer.File;           // ← Add this
-  // files?: Express.Multer.File[];        // ← Optional: if you allow multiple files
 }
 
 export enum Role{
