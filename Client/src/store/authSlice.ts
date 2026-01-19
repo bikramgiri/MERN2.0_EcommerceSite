@@ -18,6 +18,7 @@ interface User{
       username: string,
       email: string,
       password: string,
+      avatar?: string,
       token: string,
       status: string
 }

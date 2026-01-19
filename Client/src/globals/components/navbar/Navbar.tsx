@@ -1,27 +1,75 @@
-import { useState } from "react";
-import { ShoppingCart, Menu, X, Bell, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { ShoppingCart, Menu, X, Bell, Search, Heart, LogOut, Settings } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
+import { logOut } from "../../../store/authSlice";
+import { CgProfile } from "react-icons/cg";
+import { GrDashboard } from "react-icons/gr";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);           // mobile menu
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // user dropdown
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false); // notifications dropdown
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
 
-  // Replace with real cart count from context/redux later
-  const cartCount = 3;
-  const notificationCount = 1
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { user, token } = useAppSelector((state) => state.auth);
+
+  // Dynamic values (replace with real Redux selectors later if needed)
+  const cartCount = 3; 
+  const unreadNotifications = 2;   
+  // const favouritesCount = 5;       
+
+  // mark all notifications as read (example function)
+  const markAllAsRead = () => {
+    // Implement marking notifications as read
+    alert("All notifications marked as read!");
+  };
+
+  // Check login status (most reliable way)
+  const isLoggedIn = !!token || !!user?.token;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const handleLogOut = () => {
+    dispatch(logOut());
+    localStorage.removeItem("token");
+    setIsDropdownOpen(false);
+    setIsOpen(false);
+    navigate("/login?logout=true");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md border-b border-gray-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
 
-          {/* Logo - left side */}
+          {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <span className="text-2xl font-bold text-indigo-700 tracking-tight">
               Ecommerce Hub
             </span>
           </Link>
 
-          {/* Center - Search bar (visible on md+ screens) */}
+          {/* Center - Search bar (desktop only) */}
           <div className="hidden md:flex flex-1 justify-center max-w-xl mx-8">
             <div className="relative w-full max-w-lg">
               <input
@@ -33,39 +81,138 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Right side actions */}
+          {/* Right side icons + auth */}
           <div className="flex items-center gap-5 md:gap-7">
-           {/* Favourite */}
-            {/* <Link
-              to="/favorites"
-              className="relative text-indigo-700 hover:text-indigo-900 transition-colors p-1.5 rounded-full hover:bg-indigo-50"
-            >
-              <Heart className="h-6 w-6" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
-              )}
-            </Link> */}
+            {/* Notifications (only visible when logged in) */}
+            {/* {isLoggedIn && (
+              <button
+                type="button"
+                className="cursor-pointer relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
+                onClick={() => navigate("/notifications")}
+              >
+                <Bell className="h-6 w-6" />
+                {unreadNotifications > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {unreadNotifications}
+                  </span>
+                )}
+              </button>
+            )} */}
+            {/* Notifications Button & Dropdown */}
+            {isLoggedIn && (
+              <div className="relative" ref={notificationsRef}>
+                <button
+                  type="button"
+                  className="cursor-pointer relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
+                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                >
+                  <Bell className="h-6 w-6" />
+                  {unreadNotifications > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                      {unreadNotifications}
+                    </span>
+                  )}
+                </button>
 
-            {/* Notifications */}
-            <button
-              type="button"
-              className="cursor-pointer relative text-indigo-700 hover:text-indigo-900 transition-colors p-1.5 rounded-full hover:bg-indigo-50"
-            >
-              <span className="sr-only">Notifications</span>
-              <Bell className="h-6 w-6" />
-                {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {notificationCount}
-                </span>
-              )}
-            </button>
+                {/* Notifications Dropdown */}
+                {isNotificationsOpen && (
+                  <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+                      <h3 className="font-semibold">Notifications</h3>
+                      <button
+                        onClick={markAllAsRead}
+                        className="cursor-pointer text-xs underline hover:text-purple-200 transition-colors"
+                      >
+                        Mark all read
+                      </button>
+                    </div>
 
-            {/* Cart */} 
+                    {/* Notification Items */}
+                    <div className="max-h-96 overflow-y-auto">
+                      {/* Example Notification 1 */}
+                      <div className="cursor-pointer p-4 border-b border-gray-100 hover:bg-purple-50 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                            <span className="text-green-600 text-xl">✓</span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Your booking has been <span className="text-green-600 font-semibold">confirmed</span>
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">2 minutes ago</p>
+                        </div>
+                      </div>
+
+                      {/* Example Notification 2 */}
+                      <div className="cursor-pointer p-4 border-b border-gray-100 hover:bg-purple-50 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                            <span className="text-purple-600 text-xl">%</span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Special offer! Get <span className="text-purple-600 font-semibold">20% off</span> your next booking
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">1 hour ago</p>
+                        </div>
+                      </div>
+
+                      {/* Example Notification 3 */}
+                      <div className="cursor-pointer p-4 hover:bg-purple-50 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                            <span className="text-green-600 text-xl">$</span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Payment of <span className="font-semibold">$150</span> was successful
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Yesterday</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Link */}
+                    <div className="px-5 py-3 bg-gray-50 text-center border-t border-gray-200">
+                      <Link
+                        to="/notifications"
+                        className="text-indigo-600 hover:text-indigo-800 font-medium text-sm transition-colors"
+                        onClick={() => {
+                          setIsNotificationsOpen(false);
+                          setIsOpen(false);
+                        }}
+                      >
+                        View All Notifications
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* {isLoggedIn && (
+              <Link
+                to="/favourites"
+                className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
+              >
+                <Heart className="h-6 w-6" />
+                {favouritesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {favouritesCount}
+                  </span>
+                )}
+
+              </Link>
+            )} */}
+
+            {/* Cart (always visible) */}
             <Link
               to="/cart"
-              className="relative text-indigo-700 hover:text-indigo-900 transition-colors p-1.5 rounded-full hover:bg-indigo-50"
+              className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
             >
               <ShoppingCart className="h-6 w-6" />
               {cartCount > 0 && (
@@ -75,25 +222,199 @@ const Navbar = () => {
               )}
             </Link>
 
-            {/* Auth buttons (desktop) */}
+            {/* Desktop - Auth / User Dropdown */}
             <div className="hidden md:flex items-center gap-4">
-              <Link
-                to="/login"
-                className="text-indigo-700 font-medium hover:text-indigo-900 transition-colors"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-800 transition-colors shadow-sm"
-              >
-                Register
-              </Link>
+              {!isLoggedIn ? (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-indigo-700 font-medium hover:text-indigo-900 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-800 transition-colors shadow-sm"
+                  >
+                    Register
+                  </Link>
+                </>
+              ) : (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center gap-2 cursor-pointer focus:outline-none"
+                  >
+                    <img
+                      className="w-10 h-10 rounded-full object-cover border-2 border-indigo-200"
+                      src={user?.avatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
+                      alt="User avatar"
+                    />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-2xl border border-gray-300 py-2 z-50">
+                      <div className="px-5 py-4 border-b border-gray-300">
+                        <div className="flex items-center gap-3">
+                          <img
+                            className="w-12 h-12 rounded-full object-cover"
+                            src={user?.avatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
+                            alt="User avatar"
+                          />
+                          <div>
+                            <p className="font-medium text-gray-900">{user?.username || "User"}</p>
+                            <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="py-2">
+                        {/* <Link
+                          to="/dashboard"
+                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <GrDashboard className="h-5 w-5" />
+                          Dashboard
+                        </Link> */}
+                        <Link 
+                        to="/dashboard" 
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                            <GrDashboard className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Dashboard
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">View your dashboard</p>
+                        </div>
+                      </Link>
+                        {/* <Link
+                          to="/profile"
+                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <CgProfile className="h-5 w-5" />
+                          Profile
+                        </Link> */}
+                         <Link 
+                        to="/profile" 
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                            <CgProfile className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Profile
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Edit your profile</p>
+                        </div>
+                      </Link>
+                        {/* <Link
+                          to="/myorders"
+                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <ShoppingCart className="h-5 w-5" />
+                          My Orders
+                        </Link> */}
+                        <Link 
+                        to="/myorders" 
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                            <ShoppingCart className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            My Orders
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">View your orders</p>
+                        </div>
+                      </Link>
+                        {/* <Link
+                          to="/favourites"
+                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <Heart className="h-5 w-5" />
+                          Favourites
+                        </Link> */}
+                        <Link 
+                        to="/favourites" 
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                            <Heart className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Favourites
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Saved products</p>
+                        </div>
+                      </Link>
+                        {/* <Link
+                          to="/settings"
+                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <Settings className="h-5 w-5" />
+                          Settings
+                        </Link> */}
+                        <Link 
+                        to="/settings" 
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                            <Settings className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Settings
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Preferences</p>
+                        </div>
+                      </Link>
+                      </div>
+
+                      {/* <div className="border-t border-gray-300"> */}
+                        {/* <button
+                          onClick={handleLogOut}
+                          className="cursor-pointer w-full text-left px-5 py-2.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                        >
+                          <LogOut className="h-5 w-5 inline-block mr-2" />
+                          Log out
+                        </button> */}'
+                        <button
+                        onClick={handleLogOut}
+                        className="cursor-pointer border-t border-gray-300 w-full text-left px-5 py-2 text-red-600 hover:bg-red-100 transition-colors flex gap-3">
+                        <div className="flex-shrink-0">
+                            <LogOut className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-red-600 ">
+                            Log out
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Sign out of your account</p>
+                        </div>
+                      </button>
+                        
+                      </div>
+                    // </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile Hamburger Button */}
             <button
-              className="md:hidden text-indigo-700 hover:text-indigo-900 focus:outline-none p-1.5 rounded-full hover:bg-indigo-50"
+              className="cursor-pointer md:hidden text-indigo-700 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-50 focus:outline-none"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -102,54 +423,89 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
-          <div className="px-4 py-5 space-y-5">
-            {/* Mobile search */}
+          <div className="px-5 py-6 space-y-6">
+            {/* Mobile Search */}
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search products..."
-                className="w-full pl-11 pr-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 placeholder-gray-500"
+                className="w-full pl-11 pr-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 placeholder-gray-500"
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
             </div>
 
-            {/* Mobile links */}
-            <Link
-              to="/"
-              className="block text-lg font-medium text-gray-800 hover:text-indigo-700 transition-colors py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Home
-            </Link>
+            {/* Auth / User Section in Mobile Menu */}
+            {!isLoggedIn ? (
+              <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
+                <Link
+                  to="/login"
+                  className="text-center py-3 text-indigo-700 font-medium border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="text-center py-3 bg-indigo-700 text-white font-medium rounded-lg hover:bg-indigo-800 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Register
+                </Link>
+              </div>
+            ) : (
+              <div className="pt-4 border-t border-gray-100 space-y-4">
+                {/* User Info in Mobile */}
+                <div className="flex items-center gap-3 px-2">
+                  <img
+                    className="w-10 h-10 rounded-full object-cover border-2 border-indigo-200"
+                    src={user?.avatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
+                    alt="User avatar"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-900">{user?.username || "Account"}</p>
+                    <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+                  </div>
+                </div>
 
-            <Link
-              to="/products"
-              className="block text-lg font-medium text-gray-800 hover:text-indigo-700 transition-colors py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Products
-            </Link>
+                <Link
+                  to="/profile"
+                  className="block py-2.5 px-2 text-gray-800 hover:text-indigo-700 hover:bg-gray-200 rounded-lg transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <CgProfile className="h-5 w-5 inline-block mr-2" />
+                  Profile
+                </Link>
 
-            {/* Mobile auth */}
-            <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
-              <Link
-                to="/login"
-                className="text-center py-3 text-indigo-700 font-medium border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="text-center py-3 bg-indigo-700 text-white font-medium rounded-lg hover:bg-indigo-800 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Register
-              </Link>
-            </div>
+                <Link
+                  to="/myorders"
+                  className="block py-2.5 px-2 text-gray-800 hover:text-indigo-700 hover:bg-gray-200 rounded-lg transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <ShoppingCart className="h-5 w-5 inline-block mr-2" />
+                  My Orders
+                </Link>
+
+                <Link
+                  to="/favourites"
+                  className="block py-2.5 px-2 text-gray-800 hover:text-indigo-700 hover:bg-gray-200 rounded-lg transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Heart className="h-5 w-5 inline-block mr-2" />
+                  Favourites
+                </Link>
+
+                <button
+                  onClick={handleLogOut}
+                  className="cursor-pointer w-full text-left py-2.5 px-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                >
+                  <LogOut className="h-5 w-5 inline-block mr-2" />
+                  Log out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
