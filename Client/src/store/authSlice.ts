@@ -1,15 +1,15 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { STATUSES } from "../globals/statuses";
+import { Status  } from "../globals/statuses";
 import { API } from "../http";
 import type { AppDispatch } from "./store";
 
-interface RegisterData{
+interface registerData{
       username: string,
       email: string,
       password: string
 }
 
-interface LoginData{
+interface loginData{
       email: string,
       password: string
 }
@@ -30,9 +30,9 @@ interface AuthState{
 
 const initialState: AuthState = {
   user : {} as User,
-  status: STATUSES.LOADING,
-      // token: "",
-  token: localStorage.getItem("token") || "", // Load on init
+  status: Status.LOADING,
+      token: "",
+  // token: localStorage.getItem("token") || "", // Load on init
 };
 
 const authSlice = createSlice({
@@ -40,12 +40,12 @@ const authSlice = createSlice({
   initialState,
   reducers: {
       setUser(state:AuthState, action:PayloadAction<User>){
-            state.user = action.payload; 
+        state.user = action.payload; 
       },
       setStatus(state:AuthState, action:PayloadAction<string>){
-            state.status = action.payload;
+        state.status = action.payload;
       },
-      setToken: (state, action) => {
+      setToken: (state: AuthState, action: PayloadAction<string>) => {
       state.token = action.payload;
       if (action.payload) {
         localStorage.setItem("token", action.payload);
@@ -59,46 +59,50 @@ const authSlice = createSlice({
       // remove token from localStorage
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
-      state.status = STATUSES.IDLE;
+      state.status = Status.IDLE;
     },
     resetAuth: (state) => {
       state.user = {} as User;
       state.token = "";
-      state.status = STATUSES.IDLE;
+      state.status = Status.IDLE;
       localStorage.removeItem("token");
     },
+    resetAuthStatus: (state: AuthState) => {
+      state.status = Status.LOADING;
+    }
   },
 });
 
-export const { setUser, setStatus, setToken, logOut, resetAuth } = authSlice.actions;
+export const { setUser, setStatus, setToken, logOut, resetAuth, resetAuthStatus } = authSlice.actions;
 export default authSlice.reducer;
 
-export function registerUser(data: RegisterData) {
+export function registerUser(data: registerData) {
   return async function registerUserThunk(dispatch: AppDispatch) {
-    dispatch(setStatus(STATUSES.LOADING));
+    dispatch(setStatus(Status.LOADING));
     try {
       const response = await API.post("/register", data);
-      console.log("Register Response:", response.data); // Debug response
       if(response.status === 201){
-            dispatch(setStatus(STATUSES.SUCCESS));
+          dispatch(setStatus(Status.SUCCESS));
+          return response.data;
       }
     } catch (error) {
       console.log("Failed to register user:", error);
-      dispatch(setStatus(STATUSES.ERROR));
+      dispatch(setStatus(Status.ERROR));
+      throw error; // Rethrow the error for further handling
     }
   };
 }
 
-export function loginUser(data: LoginData) {
+export function loginUser(data: loginData) {
   return async function loginUserThunk(dispatch: AppDispatch) {
-    dispatch(setStatus(STATUSES.LOADING));
+    dispatch(setStatus(Status.LOADING));
     try {
       const response = await API.post("/login", data);
       console.log("Login Response:", response.data); // Debug response
       if (response.status === 200) {
          dispatch(setUser(response.data.data));
          dispatch(setToken(response.data.token));
-         dispatch(setStatus(STATUSES.SUCCESS));
+         dispatch(setStatus(Status.SUCCESS));
       }
       // Save token to cookies
       // document.cookie = `token=${response.data.token}; path=/`;
@@ -106,7 +110,8 @@ export function loginUser(data: LoginData) {
       // localStorage.setItem("token", response.data.token);
     } catch (error) {
       console.log("Failed to login user:", error);
-      dispatch(setStatus(STATUSES.ERROR));
+      dispatch(setStatus(Status.ERROR));
+      throw error; // Rethrow the error for further handling
     }
   };
 }

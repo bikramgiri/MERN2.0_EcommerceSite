@@ -3,18 +3,17 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import type { AuthFormProps } from "../types";
 
-type AuthFormProps = {
-  type: "login" | "register";
-};
-
-const AuthForm = ({ type }: AuthFormProps ) => {
-      const [showPassword, setShowPassword] = useState(false);
+const AuthForm = ({ type, onSubmit, onChange, values, errors, message }: AuthFormProps ) => {
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 py-10 md:py-14 mt-1 sm:mt-4 lg:mt-10 ">
       <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md sm:max-w-lg lg:max-w-md border border-gray-200">
         {/* Header */}
         <div className="text-center mb-8">
+        {message && <p className="text-green-500 text-center mb-4">{message}</p>}
+        {/* {errors?.general && <p className="text-red-500 text-center mb-4">{errors.general}</p>} */}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
             {type === "login"
               ? "Login to Your Account"
@@ -28,7 +27,7 @@ const AuthForm = ({ type }: AuthFormProps ) => {
         </div>
 
         {/* Form */}
-        <form className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-5">
           {type !== "login" && (
             <div>
               <label
@@ -41,9 +40,12 @@ const AuthForm = ({ type }: AuthFormProps ) => {
                 type="text"
                 id="username"
                 name="username"
+                value={values.username || ""}
+                onChange={onChange}
                 className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900"
                 placeholder="Enter your username*"
               />
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
             </div>
           )}
 
@@ -58,9 +60,12 @@ const AuthForm = ({ type }: AuthFormProps ) => {
               type="email"
               id="email"
               name="email"
+              value={values.email}
+              onChange={onChange}
               className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900"
               placeholder="Enter your email*"
             />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
 
           <div className="relative">
@@ -74,6 +79,8 @@ const AuthForm = ({ type }: AuthFormProps ) => {
               type={showPassword ? "text" : "password"}
               id="password"
               name="password"
+              value={values.password}
+              onChange={onChange}
               className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900 pr-12"
               placeholder="Enter your password*"
             />
@@ -88,6 +95,7 @@ const AuthForm = ({ type }: AuthFormProps ) => {
                 <AiFillEye className="h-5 w-5" />
               )}
             </button>
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
            
           <div className={`${type === "login" ? "flex items-center justify-between" : null}`}>
