@@ -77,6 +77,7 @@ class AuthController {
     if (!email || !password) {
       res.status(400).json({
         message: "Please provide email and password",
+        field: "general"
       });
       return;
     }
@@ -87,6 +88,7 @@ class AuthController {
       if (!userExist) {
         res.status(404).json({
           message: "User not found",
+          field: "email"
         });
         return;
       }
@@ -95,7 +97,8 @@ class AuthController {
       const passwordIsValid = bcrypt.compareSync(password, userExist.password);
       if (!passwordIsValid) {
         res.status(401).json({
-          message: "Invalid email or password",
+          message: "Invalid password",
+          field: "password"
         });
         return;
       }
