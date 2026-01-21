@@ -50,6 +50,18 @@ class User extends Model {
             allowNull : false
       })
       declare password : string;
+
+      @Column({
+            type : DataType.STRING,
+            allowNull : true
+      })
+      declare otp : string;
+
+      @Column({
+            type : DataType.DATE,
+            allowNull : true
+      })
+      declare otpGeneratedTime: Date;
 }
 
 export default User;
