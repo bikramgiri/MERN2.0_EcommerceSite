@@ -6,6 +6,7 @@ import Footer from './globals/components/footer/Footer'
 import Home from './pages/home/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import ProductDetails from './pages/productDetails/ProductDetails'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/productdetails/:id" element={<ProductDetails />} />
     </Routes>
     <Footer />
     </BrowserRouter>

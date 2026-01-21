@@ -15,6 +15,7 @@ interface loginData{
 }
 
 interface User{
+      id: string,
       username: string,
       email: string,
       password: string,
@@ -81,7 +82,7 @@ export function registerUser(data: registerData) {
   return async function registerUserThunk(dispatch: AppDispatch) {
     dispatch(setStatus(Status.LOADING));
     try {
-      const response = await API.post("/register", data);
+      const response = await API.post("/auth/register", data);
       if(response.status === 201){
           dispatch(setStatus(Status.SUCCESS));
           return response.data;
@@ -98,7 +99,7 @@ export function loginUser(data: loginData) {
   return async function loginUserThunk(dispatch: AppDispatch) {
     dispatch(setStatus(Status.LOADING));
     try {
-      const response = await API.post("/login", data);
+      const response = await API.post("/auth/login", data);
       console.log("Login Response:", response.data); // Debug response
       if (response.status === 200) {
          dispatch(setUser(response.data.data));

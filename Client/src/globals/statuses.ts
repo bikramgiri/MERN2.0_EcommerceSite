@@ -1,4 +1,4 @@
-// export const STATUSES = Object.freeze({
+// export const Status = Object.freeze({
 //       SUCCESS: "success",
 //       ERROR: "error",
 //       LOADING: "loading",
@@ -20,3 +20,10 @@ export const Status = {
 } as const;
 
 export type StatusType = keyof typeof Status;     
+
+// export interface Status {
+//   SUCCESS: "success",
+//   ERROR: "error",
+//   LOADING: "loading",
+//   IDLE: "idle",
+// } 

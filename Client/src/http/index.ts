@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // For unlogin user
 export const API = axios.create({
-      baseURL : "http://localhost:4000/auth",
+      baseURL : "http://localhost:4000",
       // withCredentials: true, // cookies
       headers: {
             "Content-Type": "application/json",
@@ -13,7 +13,7 @@ export const API = axios.create({
 
 // For Login user
 export const APIAuthenticated = axios.create({
-      baseURL : "http://localhost:4000/auth",
+      baseURL : "http://localhost:4000",
       // withCredentials: true, // cookies
       headers: {
             "Content-Type": "application/json",
