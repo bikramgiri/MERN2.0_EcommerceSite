@@ -24,17 +24,31 @@ interface User{
       status: string
 }
 
+interface VerifyOTPData{
+      email: string,
+      otp: string
+}
+
+interface ChangePasswordData{
+      email: string,
+      otp: string,
+      newPassword: string,
+      confirmPassword: string
+}
+
 interface AuthState{
       user: User,
       status: string,
-      token: string
+      token: string,
+      email: string
 }
 
 const initialState: AuthState = {
   user : {} as User,
-  status: Status.LOADING,
+  status: Status.IDLE,
       token: "",
   // token: localStorage.getItem("token") || "", // Load on init
+  email: ""
 };
 
 const authSlice = createSlice({
@@ -71,11 +85,14 @@ const authSlice = createSlice({
     },
     resetAuthStatus: (state: AuthState) => {
       state.status = Status.LOADING;
-    }
+    },
+    setEmail: (state: AuthState, action: PayloadAction<string>) => {
+      state.email = action.payload;
+  },
   },
 });
 
-export const { setUser, setStatus, setToken, logOut, resetAuth, resetAuthStatus } = authSlice.actions;
+export const { setUser, setStatus, setToken, logOut, resetAuth, resetAuthStatus, setEmail } = authSlice.actions;
 export default authSlice.reducer;
 
 export function registerUser(data: registerData) {
@@ -118,3 +135,51 @@ export function loginUser(data: loginData) {
   };
 }
 
+export function forgotPassword(data: { email: string }) {
+  return async function forgotPasswordThunk(dispatch: AppDispatch) {
+    dispatch(setStatus(Status.LOADING));
+    try {
+      const response = await API.post("/auth/forgotPassword", data);
+      dispatch(setEmail(response.data.data));
+      // dispatch(setMessage(response.data.message)); // Set the backend message
+      dispatch(setStatus(Status.SUCCESS));
+      return response; // Return response for further handling
+    } catch (error) {
+      console.log("Failed to forgot password:", error);
+      dispatch(setStatus(Status.ERROR));
+      // dispatch(setError(error.response?.data?.message || "Failed to send OTP")); // Set error message
+      throw error; // Rethrow error for further handling
+    }
+  };
+}
+
+export function verifyOTP(data: VerifyOTPData) {
+  return async function verifyOTPThunk(dispatch: AppDispatch) {
+    dispatch(setStatus(Status.LOADING));
+    try {
+      const response = await API.post("/auth/verifyOTP", data);
+      dispatch(setEmail(data.email));
+      dispatch(setStatus(Status.SUCCESS));
+      return response; // Return response for further handling
+    } catch (error) {
+      console.log("Failed to verify OTP:", error);
+      dispatch(setStatus(Status.ERROR));
+      throw error; // Rethrow error for further handling
+    }
+  };
+}
+
+export function changePassword(data: ChangePasswordData) {
+  return async function changePasswordThunk(dispatch: AppDispatch) {
+    dispatch(setStatus(Status.LOADING));
+    try {
+      const response = await API.post("/auth/changePassword", data);
+      dispatch(setStatus(Status.SUCCESS));
+      return response;
+    } catch (error) {
+      console.log("Failed to change password:", error);
+      dispatch(setStatus(Status.ERROR));
+      throw error; 
+    }
+  };
+}

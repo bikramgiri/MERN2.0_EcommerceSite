@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { fetchSingleProduct } from "../../../../store/productSlice";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/hooks";
-import { Facebook, Heart, Minus, Plus } from "lucide-react";
+import { ArrowLeft, Facebook, Heart, Loader2, Minus, Plus } from "lucide-react";
 import { BsMessenger, BsWhatsapp } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import { Status } from "../../../../globals/statuses";
 
 interface SingleProductProps {
   productId: string;
 }
 
 const SingleProduct = ({ productId }: SingleProductProps) => {
+    const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { singleProduct, status } = useAppSelector((state) => state.product);
 
@@ -31,10 +34,22 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
     }
   };
 
-  if (status === "loading") {
+  // if (status === "loading") {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-[70vh]">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-700"></div>
+  //     </div>
+  //   );
+  // }
+
+    // Loading State
+  if (status === Status.LOADING) {
     return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-700"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50">
+        <div className="text-center">
+          <Loader2 className="w-16 h-16 animate-spin text-indigo-600 mx-auto mb-4" />
+          <p className="text-xl text-gray-600">Loading product.....</p>
+        </div>
       </div>
     );
   }
@@ -49,6 +64,17 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
 
   return (
     <section className="py-6 md:py-10 bg-gray-50 min-h-screen">
+      <div className="">
+        {/* Back to Products Button - Improved Design */}
+        <div className="mt-10 ml-10">
+          <button
+            onClick={() => navigate("/")} // or navigate("/") if you prefer home
+            className="cursor-pointer group inline-flex items-center px-2 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-700 font-medium text-lg shadow-sm hover:shadow-md hover:border-indigo-400 hover:bg-indigo-50 transition-all duration-300"
+          >
+            <ArrowLeft className="w-5 h-5 text-indigo-700" />
+            <span>Back to Products</span>
+          </button>
+        </div>
       {/* Main Product Container */}
       <div className="flex flex-col lg:flex-row lg:gap-12 bg-white  shadow-sm overflow-hidden">
         {/* Left - Image */}
@@ -180,6 +206,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
             <p className="text-base">{singleProduct.productDescription}</p>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

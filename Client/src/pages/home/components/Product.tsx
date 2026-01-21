@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { fetchProducts } from '../../../store/productSlice';
-import { ArrowLeft, ArrowRight, ShoppingCart} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { Status } from '../../../globals/statuses';
 
 const Product = () => {
   const dispatch = useAppDispatch();
@@ -64,8 +65,29 @@ const Product = () => {
     }, 0);
   }, [selectedBrands, categoryFilter, priceRange, ratingFilter, sortBy, searchBrand]);
 
-  if (status === 'loading') return <div className="text-center py-20 text-xl">Loading products...</div>;
-  if (status === 'error') return <div className="text-center py-20 text-red-600 text-xl">Error loading products</div>;
+    // Loading State
+  if (status === Status.LOADING) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50">
+        <div className="text-center">
+          <Loader2 className="w-16 h-16 animate-spin text-indigo-600 mx-auto mb-4" />
+          <p className="text-xl text-gray-600">Loading product.....</p>
+        </div>
+      </div>
+    );
+  }
+
+    // ERROR State
+  if (status === Status.ERROR) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50">
+        <div className="text-center">
+          <Loader2 className="w-16 h-16 animate-spin text-indigo-600 mx-auto mb-4" />
+          <p className="text-xl text-gray-600">Error loading product.....</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="bg-gray-50 py-8 md:py-12">
@@ -156,14 +178,14 @@ const Product = () => {
                     )}
                   </div>
 
-                    <button
+                    {/* <button
               type="button"
               disabled={product.productTotalStockQty === 0}
               className="cursor-pointer flex items-center justify-center rounded-xl px-5 py-3 text-base font-semibold text-white bg-indigo-700 hover:bg-indigo-800 transition-colors"
             >
               <ShoppingCart className="w-6 h-6 mr-3" />
               Add to Cart
-            </button>
+            </button> */}
 
                 </div>
               </Link>
@@ -191,7 +213,7 @@ const Product = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`h-10 w-10 rounded-md text-sm font-medium transition ${
+                  className={`cursor-pointer h-10 w-10 rounded-md text-sm font-medium transition ${
                     currentPage === page
                       ? 'bg-indigo-600 text-white'
                       : 'text-indigo-700 hover:bg-indigo-50'

@@ -89,15 +89,21 @@ const Login = () => {
           const msg = errData.message || "Login failed";
 
           if (field && ["email", "password", "general"].includes(field)) {
-            setErrors((prev) => ({ ...prev, [field]: msg }));
+            setTimeout(() => {
+              setErrors((prev) => ({ ...prev, [field]: msg }));
+            }, 2000);
           } else {
-            setErrors((prev) => ({ ...prev, general: msg }));
+            setTimeout(() => {
+              setErrors((prev) => ({ ...prev, general: msg }));
+            }, 2000);
           }
         } else {
-          setErrors((prev) => ({
+          setTimeout(() => {
+            setErrors((prev) => ({
             ...prev,
             general: "Something went wrong. Please try again.",
           }));
+          }, 2000);
         }
       });
   };
