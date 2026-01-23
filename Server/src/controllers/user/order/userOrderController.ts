@@ -260,11 +260,12 @@ class UserOrderController {
     return;
   }
 
-  const orderId = req.params.id;
-  if (!orderId) {
-    res.status(400).json({ message: "Order ID is required" });
-    return;
-  }
+   const { id: orderId } = req.params; // ← safe destructuring
+      // Type guard
+      if (!orderId || typeof orderId !== 'string' || orderId.trim() === '') {
+        res.status(400).json({ message: "Valid Order ID is required" });
+        return;
+      }
 
   const { 
     phoneNumber, 
@@ -580,13 +581,13 @@ class UserOrderController {
       });
       return;
     }
-    const orderId = req.params.id;
-    if (!orderId) {
-      res.status(400).json({
-        message: "Order ID is required",
-      });
-      return;
-    }
+    const { id: orderId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!orderId || typeof orderId !== 'string' || orderId.trim() === '') {
+        res.status(400).json({ message: "Valid Order ID is required" });
+        return;
+      }
 
     try {
       const order = await Order.findByPk(orderId);
@@ -627,13 +628,13 @@ class UserOrderController {
 
   // *Update Order Status (Admin Purpose)
   async updateOrderStatus(req:AuthRequest, res:Response): Promise<void> {
-    const orderId = req.params.id;
-    if (!orderId) {
-      res.status(400).json({
-        message: "Order ID is required",
-      });
-      return;
-    }
+     const { id: orderId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!orderId || typeof orderId !== 'string' || orderId.trim() === '') {
+        res.status(400).json({ message: "Valid Order ID is required" });
+        return;
+      }
 
     const { orderStatus } = req.body;
     if (!orderStatus) {

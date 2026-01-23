@@ -6,6 +6,7 @@ import Cart from "../models/cartModel";
 import Order from "../models/orderModel";
 import OrderDetail from "../models/orderDetailsModel";
 import Payment from "../models/paymentModel";
+import UserFavorites from "../models/userFavoritesModel";
 
 const sequelize = new Sequelize({
   database: process.env.DB_NAME as string,
@@ -77,5 +78,20 @@ Payment.hasOne(Order, { foreignKey: "paymentId" });
 // User and order relationship
 Order.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(Order, { foreignKey: "userId" });
+
+// Use a different alias for the association
+User.belongsToMany(Product, {
+  through: UserFavorites,
+  foreignKey: 'userId',
+  otherKey: 'productId',
+  as: 'FavoritedProducts'       // ← changed from 'favoriteProducts' to 'FavoritedProducts'
+});
+
+Product.belongsToMany(User, {
+  through: UserFavorites,
+  foreignKey: 'productId',
+  otherKey: 'userId',
+  as: 'UsersWhoFavorited'       // optional, but good to be consistent
+});
 
 export default sequelize;

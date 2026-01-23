@@ -46,10 +46,10 @@ class AuthController {
       return;
     }
 
-    // validate password length must be at least 6 characters
-    if (password.length < 6) {
+    // validate password length must be at least 8 characters
+    if (password.length < 8) {
       res.status(400).json({
-        message: "Password must be at least 6 characters long",
+        message: "Password must be at least 8 characters long",
         field: "password",
       });
       return;
@@ -108,6 +108,7 @@ class AuthController {
       const token = jwt.sign(
         { id: userExist.id },
         process.env.JWT_SECRET_KEY as string,
+        
         {
           expiresIn: "1d", // Token valid for 1 day
         },
@@ -353,9 +354,9 @@ class AuthController {
   await userExist.save(); // Save the updated user document
 
   // Validate new password strength
-  if (newPassword.length < 6) {
+  if (newPassword.length < 8) {
     res.status(400).json({
-      message: "New password must be at least 6 characters long",
+      message: "New password must be at least 8 characters long",
     });
     return;
   }

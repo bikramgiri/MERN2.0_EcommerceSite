@@ -2,14 +2,7 @@ import {
       Table,
       Column,
       Model,
-      DataType,
-      PrimaryKey,
-      AutoIncrement,
-      AllowNull,
-      Unique,
-      Default,
-      CreatedAt,
-      UpdatedAt
+      DataType
 } from 'sequelize-typescript';
 
 // *First Method
@@ -62,6 +55,22 @@ class User extends Model {
             allowNull : true
       })
       declare otpGeneratedTime: Date;
+      
+
+//       // Use a different alias for the association
+// User.belongsToMany(Product, {
+//   through: UserFavorites,
+//   foreignKey: 'userId',
+//   otherKey: 'productId',
+//   as: 'FavoritedProducts'       // ← changed from 'favoriteProducts' to 'FavoritedProducts'
+// });
+
+// Product.belongsToMany(User, {
+//   through: UserFavorites,
+//   foreignKey: 'productId',
+//   otherKey: 'userId',
+//   as: 'UsersWhoFavorited'       // optional, but good to be consistent
+// });
 }
 
 export default User;

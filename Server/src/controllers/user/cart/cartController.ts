@@ -207,13 +207,13 @@ class CartController {
       return;
     }
 
-    const productId = req.params.id;
-    if (!productId) {
-      res.status(400).json({
-        message: "Please provide productId",
-      });
-      return;
-    }
+     const { id: productId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!productId || typeof productId !== 'string' || productId.trim() === '') {
+        res.status(400).json({ message: "Valid Product ID is required" });
+        return;
+      }
 
     // check whether the product exists in the cart or not
     const existingProduct = await Cart.findByPk(productId);

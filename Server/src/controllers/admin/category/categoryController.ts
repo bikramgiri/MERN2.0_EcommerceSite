@@ -86,8 +86,14 @@ class CategoryController {
 
   // *Get Category by ID
   async getSingleCategory(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
-    const category = await Category.findByPk(id);
+     const { id: categoryId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!categoryId || typeof categoryId !== 'string' || categoryId.trim() === '') {
+        res.status(400).json({ message: "Valid Category ID is required" });
+        return;
+      }
+    const category = await Category.findByPk(categoryId);
 
     if (!category) {
       res.status(404).json({
@@ -104,7 +110,14 @@ class CategoryController {
 
   // *Update Category
   async updateCategory(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
+     const { id: categoryId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!categoryId || typeof categoryId !== 'string' || categoryId.trim() === '') {
+        res.status(400).json({ message: "Valid Category ID is required" });
+        return;
+      }
+
     const { categoryName, categoryDescription } = req.body;
     if (!categoryName && !categoryDescription) {
       res.status(400).json({
@@ -138,7 +151,7 @@ class CategoryController {
       return;
     }
 
-    const category = await Category.findByPk(id);
+    const category = await Category.findByPk(categoryId);
     if (!category) {
       res.status(404).json({
         message: "Category not found",
@@ -159,8 +172,15 @@ class CategoryController {
 
   // *Delete Category
   async deleteCategory(req: Request, res: Response): Promise<void> {
-    const { id } = req.params;
-    const category = await Category.findByPk(id);
+     const { id: categoryId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!categoryId || typeof categoryId !== 'string' || categoryId.trim() === '') {
+        res.status(400).json({ message: "Valid Category ID is required" });
+        return;
+      }
+
+    const category = await Category.findByPk(categoryId);
     if (!category) {
       res.status(404).json({
         message: "Category not found",

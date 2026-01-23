@@ -173,7 +173,13 @@ class ProductController {
   // Get single product
   public static async getSingleProduct(req: Request,res: Response): Promise<void> {
     try {
-      const productId = req.params.id;
+      const productId = req.params.id;  
+      // Type guard
+      if (!productId || typeof productId !== 'string' || productId.trim() === '') {
+        res.status(400).json({ message: "Valid Product ID is required" });
+        return;
+      }
+
       const product = await Product.findByPk(productId, {
         include: [
           {
@@ -207,7 +213,13 @@ class ProductController {
   // Update Product
   public static async updateProduct(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id: productId } = req.params;
+      // Type guard
+      if (!productId || typeof productId !== 'string' || productId.trim() === '') {
+        res.status(400).json({ message: "Valid Product ID is required" });
+        return;
+      }
+
       const {
         productName,
         productDescription,
@@ -215,7 +227,7 @@ class ProductController {
         productTotalStockQty,
         categoryId,
       } = req.body;
-      const product = await Product.findByPk(id);
+      const product = await Product.findByPk(productId);
       if (!product) {
         res.status(404).json({
           message: "Product not found",
@@ -341,14 +353,15 @@ class ProductController {
     res: Response
   ): Promise<void> {
     try {
-      const { id } = req.params;
-      if (!id) {
-        res.status(400).json({
-          message: "Product ID is required",
-        });
+      const { id: productId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!productId || typeof productId !== 'string' || productId.trim() === '') {
+        res.status(400).json({ message: "Valid Product ID is required" });
         return;
       }
-      const product = await Product.findByPk(id);
+
+      const product = await Product.findByPk(productId);
       if (!product) {
         res.status(404).json({
           message: "Product not found",
@@ -446,11 +459,14 @@ class ProductController {
 
   // *Update Stock Quantity of a Product
   public static async updateProductStockQty( req: Request, res: Response): Promise<void> {
-    const productId = req.params.id;
-    if (!productId) {
-      res.status(400).json({ message: 'Product ID is required' });
-      return;
-    }
+    const { id: productId } = req.params; // ← safe destructuring
+
+      // Type guard
+      if (!productId || typeof productId !== 'string' || productId.trim() === '') {
+        res.status(400).json({ message: "Valid Product ID is required" });
+        return;
+      }
+
     try {
     const { productTotalStockQty } = req.body;
     // validate productTotalStockQty must be a number >= 0
