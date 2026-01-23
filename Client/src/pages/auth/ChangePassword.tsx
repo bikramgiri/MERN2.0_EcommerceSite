@@ -3,16 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { Status } from "../../globals/statuses";
-import { changePassword, resetAuthStatus } from "../../store/authSlice";
+import { changePassword } from "../../store/authSlice";
 import { Loader2 } from "lucide-react";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
-  const [message, setMessage] = useState("");
-  const [showNewPassword, setShowNewPassword] = useState(false); // State to toggle new password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
+
   const [userData, setUserData] = useState({
     email: "",
     otp: "",
@@ -28,27 +26,90 @@ const ChangePassword = () => {
     general: "",
   });
 
+  const [message, setMessage] = useState("");
+
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Password strength state
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    label: "",
+    color: "bg-gray-200",
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "", general: "" }));
+
+    // Calculate password strength only for newPassword field
+    if (name === "newPassword" || name === "confirmPassword") {
+      calculatePasswordStrength(value);
+    }
+  };
+
+  // Password strength calculation function
+  const calculatePasswordStrength = (password: string) => {
+    if (!password) {
+      setPasswordStrength({ score: 0, label: "", color: "bg-gray-200" });
+      return;
+    }
+
+    let score = 0;
+
+    // Length
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+
+    // Character variety
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[a-z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    // Final strength level
+    let label = "";
+    let color = "";
+
+    switch (true) {
+      case score <= 2:
+        label = "Weak";
+        color = "bg-red-500";
+        break;
+      case score === 3:
+        label = "Fair";
+        color = "bg-orange-500";
+        break;
+      case score === 4:
+        label = "Good";
+        color = "bg-yellow-500";
+        break;
+      case score === 5:
+        label = "Strong";
+        color = "bg-green-500";
+        break;
+      case score >= 6:
+        label = "Very Strong";
+        color = "bg-indigo-600";
+        break;
+      default:
+        label = "";
+        color = "bg-gray-200";
+    }
+
+    setPasswordStrength({ score, label, color });
   };
 
   const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.(com|org|net|edu|gov|in)$/i; // Matches backend regex, valid email format like user@example.com
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrors((prev) => ({
-      ...prev,
-      email: "",
-      otp: "",
-      newPassword: "",
-      confirmPassword: "",
-      general: "",
-    }));
+    setErrors({ email: "", otp: "", newPassword: "", confirmPassword: "", general: "" });
+    setMessage("");
 
     let hasError = false;
 
@@ -63,144 +124,64 @@ const ChangePassword = () => {
     }
 
     if (!userData.newPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        newPassword: "New password is required",
-      }));
+      setErrors((prev) => ({ ...prev, newPassword: "New password is required" }));
       hasError = true;
     }
 
     if (!userData.confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: "Confirm password is required",
-      }));
+      setErrors((prev) => ({ ...prev, confirmPassword: "Confirm password is required" }));
       hasError = true;
     }
 
     if (hasError) return;
 
-    // Validate email format
     if (!validateEmail(userData.email)) {
       setErrors((prev) => ({ ...prev, email: "Invalid email format" }));
-      setTimeout(() => {
-        setErrors((prev) => ({ ...prev, email: "" }));
-      }, 2000);
       return;
     }
 
-    // check opt must be 6 digit number
     const otpRegex = /^\d{6}$/;
     if (!otpRegex.test(userData.otp)) {
       setErrors((prev) => ({ ...prev, otp: "OTP must be a 6-digit number" }));
-      setTimeout(() => {
-        setErrors((prev) => ({ ...prev, otp: "" }));
-      }, 2000);
       return;
     }
 
-    // Check if new password and confirm password match
     if (userData.newPassword !== userData.confirmPassword) {
       setErrors((prev) => ({
         ...prev,
-        confirmPassword: "New password and confirm password do not match",
+        confirmPassword: "Passwords do not match",
       }));
-      setTimeout(() => {
-        setErrors((prev) => ({ ...prev, confirmPassword: "" }));
-      }, 2000);
       return;
     }
 
     dispatch(changePassword(userData))
-      .then((result) => {
-        console.log("Password changed successfully:", result);
-        setMessage("OTP verified successfully!");
+      .then(() => {
+        setMessage("Password changed successfully!");
         setTimeout(() => {
           setMessage("");
           navigate("/login");
         }, 2000);
-
-        // Reset status manually after success
-      // setTimeout(() => {
-      //   dispatch(resetAuthStatus());
-      // }, 0);
-    })
+      })
       .catch((error) => {
-        console.log("Error changing password:", error);
         const errMsg =
           error?.response?.data?.message ||
           "Failed to change password. Please try again.";
 
-        if (
-          errMsg &&
-          error?.response?.status >= 400 &&
-          error?.response?.status < 500
-        ) {
-          const field = errMsg.field;
-          const msg = errMsg || "Password change failed";
-
-          if (
-            field &&
-            [
-              "email",
-              "otp",
-              "newPassword",
-              "confirmPassword",
-              "general",
-            ].includes(field)
-          ) {
-            setTimeout(() => {
-              setErrors((prev) => ({ ...prev, [field]: msg }));
-            }, 0);
-          } else {
-            setTimeout(() => {
-              setErrors((prev) => ({ ...prev, general: msg }));
-            }, 0);
-          }
+        if (error?.response?.status === 400 || error?.response?.status === 404) {
+          setErrors((prev) => ({ ...prev, general: errMsg }));
         } else {
-          setTimeout(() => {
-            setErrors((prev) => ({
-              ...prev,
-              general: "Something went wrong. Please try again.",
-            }));
-          }, 2000);
+          setErrors((prev) => ({ ...prev, general: "Something went wrong. Please try again." }));
         }
-        // Reset status after error too
-      setTimeout(() => {
-        dispatch(resetAuthStatus());
-      }, 0);
       });
   };
 
-  //  useEffect(() => {
-  //         if (status === Status.SUCCESS) {
-  //           setTimeout(() => {
-  //           setMessage("Password changed successfully");
-  //           setTimeout(() => {
-  //             setMessage("");
-  //             navigate("/login");
-  //           }, 2000);
-  //           }, 0);
-  //           dispatch(resetAuthStatus());
-  //           console.log("Status Changed to:", status);
-  //         } else if (status === Status.ERROR) {
-  //           if (!errors.general) {
-  //             setTimeout(() => {
-  //               setErrors((prev) => ({
-  //                 ...prev,
-  //                 general: "Password change failed!",
-  //               }));
-  //             }, 0);
-  //           }
-  //         }
-  //       }, [status, errors, navigate, dispatch]);
-
   return (
-    <div className="mt-8 flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 py-10 md:py-14">
       <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md sm:max-w-lg lg:max-w-md border border-gray-200">
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-indigo-700 mb-2">Change Password</h2>
+          <h1 className="text-3xl font-bold text-indigo-700 mb-2">Ecommerce Hub</h1>
+          <h2 className="text-2xl font-bold text-gray-900">Change Password</h2>
           <p className="mt-3 text-gray-600">
             Enter your email, OTP, and new password to reset your password.
           </p>
@@ -242,7 +223,7 @@ const ChangePassword = () => {
           {/* OTP */}
           <div>
             <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1.5">
-              OTP 
+              OTP
             </label>
             <input
               type="text"
@@ -259,35 +240,64 @@ const ChangePassword = () => {
             {errors.otp && <p className="mt-1.5 text-sm text-red-600">{errors.otp}</p>}
           </div>
 
-          {/* New Password */}
-          <div className="relative">
+          {/* New Password with Strength Indicator */}
+          <div>
             <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
               New Password
             </label>
-            <input
-              type={showNewPassword ? "text" : "password"}
-              id="newPassword"
-              name="newPassword"
-              value={userData.newPassword}
-              onChange={handleChange}
-              className={`block w-full px-4 py-3 border ${
-                errors.newPassword ? "border-red-500" : "border-gray-300"
-              } rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900 pr-12`}
-              placeholder="Enter your new password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute inset-y-0 right-0 pr-4 mt-7 flex items-center text-gray-500 hover:text-indigo-600 focus:outline-none"
-            >
-              {showNewPassword ? (
-                <AiFillEyeInvisible className="h-5 w-5" />
-              ) : (
-                <AiFillEye className="h-5 w-5" />
-              )}
-            </button>
+            <div className="relative">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                id="newPassword"
+                name="newPassword"
+                value={userData.newPassword}
+                onChange={handleChange}
+                className={`block w-full px-4 py-3 border ${
+                  errors.newPassword ? "border-red-500" : "border-gray-300"
+                } rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900 pr-12`}
+                placeholder="Enter your new password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="cursor-pointer absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-indigo-600 focus:outline-none"
+              >
+                {showNewPassword ? (
+                  <AiFillEyeInvisible className="h-5 w-5" />
+                ) : (
+                  <AiFillEye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
             {errors.newPassword && (
               <p className="mt-1.5 text-sm text-red-600">{errors.newPassword}</p>
+            )}
+
+            {/* Password Strength Indicator */}
+            {userData.newPassword && (
+              <div className="mt-2">
+                <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                    style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
+                  />
+                </div>
+                <p
+                  className={`mt-1 text-sm font-sm ${
+                    passwordStrength.label === "Weak"
+                      ? "text-red-600"
+                      : passwordStrength.label === "Fair"
+                      ? "text-orange-600"
+                      : passwordStrength.label === "Good"
+                      ? "text-yellow-600"
+                      : passwordStrength.label === "Strong"
+                      ? "text-green-600"
+                      : "text-indigo-600"
+                  }`}
+                >
+                  Password Strength: {passwordStrength.label || "Enter password"}
+                </p>
+              </div>
             )}
           </div>
 
@@ -310,7 +320,7 @@ const ChangePassword = () => {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute inset-y-0 right-0 mt-7 pr-4 flex items-center text-gray-500 hover:text-indigo-600 focus:outline-none"
+              className="cursor-pointer absolute inset-y-0 right-0 mt-3 pr-4 flex items-center text-gray-500 hover:text-indigo-600 focus:outline-none"
             >
               {showConfirmPassword ? (
                 <AiFillEyeInvisible className="h-5 w-5" />
@@ -320,6 +330,33 @@ const ChangePassword = () => {
             </button>
             {errors.confirmPassword && (
               <p className="mt-1.5 text-sm text-red-600">{errors.confirmPassword}</p>
+            )}
+
+            {/* Password Strength Indicator */}
+            {userData.confirmPassword && (
+              <div className="mt-2">
+                <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                    style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
+                  />
+                </div>
+                <p
+                  className={`mt-1 text-sm font-sm ${
+                    passwordStrength.label === "Weak"
+                      ? "text-red-600"
+                      : passwordStrength.label === "Fair"
+                      ? "text-orange-600"
+                      : passwordStrength.label === "Good"
+                      ? "text-yellow-600"
+                      : passwordStrength.label === "Strong"
+                      ? "text-green-600"
+                      : "text-indigo-600"
+                  }`}
+                >
+                  Password Strength: {passwordStrength.label || "Enter password"}
+                </p>
+              </div>
             )}
           </div>
 

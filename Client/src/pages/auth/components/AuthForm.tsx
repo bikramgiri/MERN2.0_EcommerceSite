@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import type { AuthFormProps } from "../types";
 
-const AuthForm = ({ type, onSubmit, onChange, values, errors, message }: AuthFormProps ) => {
+const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordStrength }: AuthFormProps ) => {
   const [showPassword, setShowPassword] = useState(false);
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 py-10 md:py-14 mt-1 sm:mt-4 lg:mt-10 ">
       <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md sm:max-w-lg lg:max-w-md border border-gray-200">
@@ -96,6 +97,35 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message }: AuthFor
               )}
             </button>
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+
+              <div className="mt-2">
+                {/* Password Strength Indicator */}
+            {values.password && (
+              <div className="mt-2">
+                <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                    style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
+                  />
+                </div>
+                <p
+                  className={`mt-1 text-sm font-sm ${
+                    passwordStrength.label === "Weak"
+                      ? "text-red-600"
+                      : passwordStrength.label === "Fair"
+                      ? "text-orange-600"
+                      : passwordStrength.label === "Good"
+                      ? "text-yellow-600"
+                      : passwordStrength.label === "Strong"
+                      ? "text-green-600"
+                      : "text-indigo-600"
+                  }`}
+                >
+                  Password Strength: {passwordStrength.label || "Enter password"}
+                </p>
+              </div>
+            )}
+              </div>
           </div>
            
           <div className={`${type === "login" ? "flex items-center justify-between" : null}`}>

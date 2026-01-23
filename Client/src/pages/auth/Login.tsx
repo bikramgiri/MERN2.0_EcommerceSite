@@ -24,10 +24,74 @@ const Login = () => {
     general: "",
   });
 
+   // Password strength state
+    const [passwordStrength, setPasswordStrength] = useState({
+      score: 0,
+      label: "",
+      color: "bg-gray-200",
+    });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "", general: "" }));
+
+      // Calculate password strength only for newPassword field
+    if (name === "password") {
+      calculatePasswordStrength(value);
+    }
+  };
+
+    // Password strength calculation function
+  const calculatePasswordStrength = (password: string) => {
+    if (!password) {
+      setPasswordStrength({ score: 0, label: "", color: "bg-gray-200" });
+      return;
+    }
+
+    let score = 0;
+
+    // Length
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+
+    // Character variety
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[a-z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    // Final strength level
+    let label = "";
+    let color = "";
+
+    switch (true) {
+      case score <= 2:
+        label = "Weak";
+        color = "bg-red-500";
+        break;
+      case score === 3:
+        label = "Fair";
+        color = "bg-orange-500";
+        break;
+      case score === 4:
+        label = "Good";
+        color = "bg-yellow-500";
+        break;
+      case score === 5:
+        label = "Strong";
+        color = "bg-green-500";
+        break;
+      case score >= 6:
+        label = "Very Strong";
+        color = "bg-indigo-600";
+        break;
+      default:
+        label = "";
+        color = "bg-gray-200";
+    }
+
+    setPasswordStrength({ score, label, color });
   };
 
   const validateEmail = (email: string) => {
@@ -118,7 +182,6 @@ const Login = () => {
       }, 2000);
       }, 0);
       dispatch(resetAuthStatus());
-      console.log("Status Changed to:", status);
     } else if (status === Status.ERROR) {
       if (!errors.general) {
         setTimeout(() => {
@@ -154,6 +217,7 @@ const Login = () => {
         values={userData}
         errors={errors}
         message={message}
+        passwordStrength={passwordStrength}
       />
     </>
   );

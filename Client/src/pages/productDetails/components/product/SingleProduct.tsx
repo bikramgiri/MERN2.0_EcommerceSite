@@ -64,7 +64,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
 
   return (
     <section className="py-6 md:py-10 bg-gray-50 min-h-screen">
-      <div className="">
+      <div>
         {/* Back to Products Button - Improved Design */}
         <div className="mt-10 ml-10">
           <button
@@ -169,8 +169,13 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
               </button>
             </div>
 
+             {/* Product Description */}
+          <div className="prose max-w-none text-gray-700 leading-relaxed mb-6">
+            <p className="text-base">{singleProduct.productDescription}</p>
+          </div>
+
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-8 mb-8">
+          <div className="flex flex-col sm:flex-row gap-8">
 
             <button
               type="button"
@@ -199,11 +204,6 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
               <Heart className="w-6 h-6 mr-3" />
                Add to Favourite
             </button>
-          </div>
-          
-          {/* Product Description */}
-          <div className="prose max-w-none text-gray-700 leading-relaxed">
-            <p className="text-base">{singleProduct.productDescription}</p>
           </div>
         </div>
       </div>

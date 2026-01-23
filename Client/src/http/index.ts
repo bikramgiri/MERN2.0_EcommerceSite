@@ -3,34 +3,35 @@ import axios from 'axios'
 // For unlogin user
 export const API = axios.create({
       baseURL : "http://localhost:4000",
-      // withCredentials: true, // cookies
-      headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-      }
-})
+            // withCredentials: true, // cookies
+                  headers: {
+                              "Content-Type": "application/json",
+                                          "Accept": "application/json"
+                                                }
+                                                })
 
 
-// For Login user
-export const APIAuthenticated = axios.create({
-      baseURL : "http://localhost:4000",
-      // withCredentials: true, // cookies
-      headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            'Authorization': `${localStorage.getItem("token")}`
-      }
-})
+                                                // For Login user
+                                                export const APIAuthenticated = axios.create({
+                                                      baseURL : "http://localhost:4000",
+                                                            // withCredentials: true, // cookies
+                                                                  headers: {
+                                                                              "Content-Type": "application/json",
+                                                                                          "Accept": "application/json",
+                                                                                                      'Authorization': `${localStorage.getItem("token")}`
+                                                                                                            }
+                                                                                                            })
 
-// Request Interceptor: Set Authorization from localStorage dynamically
-APIAuthenticated.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+                                                                                                            // Request Interceptor: Set Authorization from localStorage dynamically
+                                                                                                            APIAuthenticated.interceptors.request.use((config) => {
+                                                                                                              const token = localStorage.getItem("token");
+                                                                                                                console.log("Attaching token to request:", token);
+                                                                                                                  if (token) {
+                                                                                                                      config.headers.Authorization = `Bearer ${token}`;
+                                                                                                                        }
+                                                                                                                          return config;
+                                                                                                                          }, (error) => {
+                                                                                                                            return Promise.reject(error);
+                                                                                                                            });
 
-// export { API, APIAuthenticated } 
+                                                                                                                            // export { API, APIAuthenticated } 

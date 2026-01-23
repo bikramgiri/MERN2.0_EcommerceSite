@@ -14,6 +14,11 @@ export interface AuthFormProps {
     general: string;
   };
   message: string;
+  passwordStrength: {
+    score: number;
+    label: string;
+    color: string;
+  };
 };
 
 export interface LoginData {

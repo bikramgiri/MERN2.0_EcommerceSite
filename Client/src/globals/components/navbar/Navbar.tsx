@@ -1,35 +1,50 @@
-import React, { useEffect, useState, useRef } from "react";
-import { ShoppingCart, Menu, X, Bell, Search, Heart, LogOut, Settings } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { ShoppingCart, Menu, X, Search, Heart, LogOut, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
 import { logOut } from "../../../store/authSlice";
 import { CgProfile } from "react-icons/cg";
 import { GrDashboard } from "react-icons/gr";
+import { fetchUserFavorites } from "../../../store/userFavouriteSlice";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);           // mobile menu
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // user dropdown
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false); // notifications dropdown
+  // const [isNotificationsOpen, setIsNotificationsOpen] = useState(false); // notifications dropdown
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const notificationsRef = useRef<HTMLDivElement>(null);
+  // const notificationsRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { user, token } = useAppSelector((state) => state.auth);
+  const { userFavorite: favorites } = useAppSelector(state => state.favorite);
 
   // Dynamic values (replace with real Redux selectors later if needed)
   const cartCount = 3; 
-  const unreadNotifications = 2;   
-  // const favouritesCount = 5;       
+  // const unreadNotifications = 2;   
+  const favouritesCount = favorites.length;       
+  
+
+    // Check login status (most reliable way)
+  // const isLoggedIn = !!token || !!user?.token;
+
+  // Check token in localStorage for persistent login state on refresh
+  const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const effectiveToken = token || storedToken;
+  const isLoggedIn = !!effectiveToken;
+
+
+  useEffect(() => {
+    if (effectiveToken) {
+      dispatch(fetchUserFavorites());
+    }
+  }, [effectiveToken, dispatch]);
 
   // mark all notifications as read (example function)
-  const markAllAsRead = () => {
-    // Implement marking notifications as read
-    alert("All notifications marked as read!");
-  };
-
-  // Check login status (most reliable way)
-  const isLoggedIn = !!token || !!user?.token;
+  // const markAllAsRead = () => {
+  //   // Implement marking notifications as read
+  //   alert("All notifications marked as read!");
+  // };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,9 +52,9 @@ const Navbar = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setIsNotificationsOpen(false);
-      }
+      // if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+      //   setIsNotificationsOpen(false);
+      // }
     };
 
     if (isDropdownOpen) {
@@ -83,23 +98,8 @@ const Navbar = () => {
 
           {/* Right side icons + auth */}
           <div className="flex items-center gap-5 md:gap-7">
-            {/* Notifications (only visible when logged in) */}
-            {/* {isLoggedIn && (
-              <button
-                type="button"
-                className="cursor-pointer relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
-                onClick={() => navigate("/notifications")}
-              >
-                <Bell className="h-6 w-6" />
-                {unreadNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                    {unreadNotifications}
-                  </span>
-                )}
-              </button>
-            )} */}
             {/* Notifications Button & Dropdown */}
-            {isLoggedIn && (
+            {/* {isLoggedIn && (
               <div className="relative" ref={notificationsRef}>
                 <button
                   type="button"
@@ -114,10 +114,8 @@ const Navbar = () => {
                   )}
                 </button>
 
-                {/* Notifications Dropdown */}
                 {isNotificationsOpen && (
                   <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
-                    {/* Header */}
                     <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
                       <h3 className="font-semibold">Notifications</h3>
                       <button
@@ -128,9 +126,7 @@ const Navbar = () => {
                       </button>
                     </div>
 
-                    {/* Notification Items */}
                     <div className="max-h-96 overflow-y-auto">
-                      {/* Example Notification 1 */}
                       <div className="cursor-pointer p-4 border-b border-gray-100 hover:bg-purple-50 transition-colors flex gap-3">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
@@ -145,7 +141,6 @@ const Navbar = () => {
                         </div>
                       </div>
 
-                      {/* Example Notification 2 */}
                       <div className="cursor-pointer p-4 border-b border-gray-100 hover:bg-purple-50 transition-colors flex gap-3">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
@@ -160,7 +155,6 @@ const Navbar = () => {
                         </div>
                       </div>
 
-                      {/* Example Notification 3 */}
                       <div className="cursor-pointer p-4 hover:bg-purple-50 transition-colors flex gap-3">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
@@ -176,7 +170,6 @@ const Navbar = () => {
                       </div>
                     </div>
 
-                    {/* Footer Link */}
                     <div className="px-5 py-3 bg-gray-50 text-center border-t border-gray-200">
                       <Link
                         to="/notifications"
@@ -192,11 +185,11 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
 
-            {/* {isLoggedIn && (
+            {isLoggedIn && (
               <Link
-                to="/favourites"
+                to="/favorites"
                 className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
               >
                 <Heart className="h-6 w-6" />
@@ -207,7 +200,7 @@ const Navbar = () => {
                 )}
 
               </Link>
-            )} */}
+            )}
 
             {/* Cart (always visible) */}
             <Link
@@ -223,18 +216,19 @@ const Navbar = () => {
             </Link>
 
             {/* Desktop - Auth / User Dropdown */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3">
               {!isLoggedIn ? (
                 <>
                   <Link
                     to="/login"
-                    className="text-indigo-700 font-medium hover:text-indigo-900 transition-colors"
+                   className="cursor-pointer flex rounded-lg px-5 py-2 text-base font-medium text-indigo-700 border-2 border-indigo-700 hover:bg-indigo-50 transition-colors"
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-800 transition-colors shadow-sm"
+                     className="bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-800 transition-colors shadow-sm"
+                   
                   >
                     Register
                   </Link>
@@ -346,7 +340,7 @@ const Navbar = () => {
                           Favourites
                         </Link> */}
                         <Link 
-                        to="/favourites" 
+                        to="/favorites" 
                         onClick={() => setIsDropdownOpen(false)}
                         className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
                         <div className="flex-shrink-0">
@@ -442,7 +436,7 @@ const Navbar = () => {
               <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
                 <Link
                   to="/login"
-                  className="text-center py-3 text-indigo-700 font-medium border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
+                  className="text-center py-3 text-indigo-700 font-medium border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   Login

@@ -14,6 +14,7 @@ export interface Category{
 
 export interface Product{
       id: string,
+      productId: string,
       productName: string,
       productImage: string,
       productDescription: string,
