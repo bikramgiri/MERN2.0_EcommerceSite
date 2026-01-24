@@ -67,7 +67,7 @@ const Favourites = () => {
 
         {favorites.length === 0 ? (
           <div className="text-center py-20">
-            <Heart className="w-20 h-20 mx-auto text-gray-300 mb-6" />
+            <Heart className="w-20 h-20 mx-auto text-indigo-700 mb-6" />
             <h2 className="text-2xl font-medium text-gray-700 mb-3">
               Your wishlist is empty
             </h2>

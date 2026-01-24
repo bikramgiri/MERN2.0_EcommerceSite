@@ -193,11 +193,21 @@ const Navbar = () => {
                 className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
               >
                 <Heart className="h-6 w-6" />
-                {favouritesCount > 0 && (
+                {/* {favouritesCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                     {favouritesCount}
                   </span>
-                )}
+                )} */}
+                { favouritesCount > 0 ? (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {favouritesCount}
+                  </span>
+                ) : (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    0
+                  </span>
+
+                ) }
 
               </Link>
             )}
@@ -249,7 +259,7 @@ const Navbar = () => {
 
                   {/* Dropdown Menu */}
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-2xl border border-gray-300 py-2 z-50">
+                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-md shadow-xl border border-gray-300 py-2 z-50">
                       <div className="px-5 py-4 border-b border-gray-300">
                         <div className="flex items-center gap-3">
                           <img
@@ -265,15 +275,15 @@ const Navbar = () => {
                       </div>
 
                       <div className="py-2">
-                        {/* <Link
+                        <Link
                           to="/dashboard"
-                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          className="flex gap-3 font-medium items-center px-5 py-2 text-gray-900 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          <GrDashboard className="h-5 w-5" />
+                          <GrDashboard className="h-7 w-7" />
                           Dashboard
-                        </Link> */}
-                        <Link 
+                        </Link>
+                        {/* <Link 
                         to="/dashboard" 
                         onClick={() => setIsDropdownOpen(false)}
                         className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
@@ -286,16 +296,16 @@ const Navbar = () => {
                           </p>
                           <p className="text-xs text-gray-500 mt-1">View your dashboard</p>
                         </div>
-                      </Link>
-                        {/* <Link
+                      </Link> */}
+                        <Link
                           to="/profile"
-                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          className="flex gap-3 font-medium items-center px-5 py-2 text-gray-900 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          <CgProfile className="h-5 w-5" />
+                          <CgProfile className="h-7 w-7" />
                           Profile
-                        </Link> */}
-                         <Link 
+                        </Link>
+                         {/* <Link 
                         to="/profile" 
                         onClick={() => setIsDropdownOpen(false)}
                         className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
@@ -308,16 +318,16 @@ const Navbar = () => {
                           </p>
                           <p className="text-xs text-gray-500 mt-1">Edit your profile</p>
                         </div>
-                      </Link>
-                        {/* <Link
+                      </Link> */}
+                        <Link
                           to="/myorders"
-                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          className="flex gap-3 font-medium items-center px-5 py-2 text-gray-900 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          <ShoppingCart className="h-5 w-5" />
+                          <ShoppingCart className="h-7 w-7" />
                           My Orders
-                        </Link> */}
-                        <Link 
+                        </Link>
+                        {/* <Link 
                         to="/myorders" 
                         onClick={() => setIsDropdownOpen(false)}
                         className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
@@ -330,16 +340,16 @@ const Navbar = () => {
                           </p>
                           <p className="text-xs text-gray-500 mt-1">View your orders</p>
                         </div>
-                      </Link>
-                        {/* <Link
-                          to="/favourites"
-                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                      </Link> */}
+                        <Link
+                          to="/favorites"
+                          className="flex gap-3 font-medium items-center px-5 py-2 text-gray-900 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          <Heart className="h-5 w-5" />
+                          <Heart className="h-7 w-7" />
                           Favourites
-                        </Link> */}
-                        <Link 
+                        </Link>
+                        {/* <Link 
                         to="/favorites" 
                         onClick={() => setIsDropdownOpen(false)}
                         className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
@@ -352,16 +362,16 @@ const Navbar = () => {
                           </p>
                           <p className="text-xs text-gray-500 mt-1">Saved products</p>
                         </div>
-                      </Link>
-                        {/* <Link
+                      </Link> */}
+                        <Link
                           to="/settings"
-                          className="flex gap-2 items-center px-5 py-2.5 text-gray-700 hover:bg-indigo-100 rounded-lg hover:text-indigo-700 transition-colors"
+                          className="flex gap-3 font-medium items-center px-5 py-2 text-gray-900 hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          <Settings className="h-5 w-5" />
+                          <Settings className="h-7 w-7" />
                           Settings
-                        </Link> */}
-                        <Link 
+                        </Link>
+                        {/* <Link 
                         to="/settings" 
                         onClick={() => setIsDropdownOpen(false)}
                         className="cursor-pointer px-5 py-2 hover:bg-indigo-100 hover:bg-indigo-100 hover:text-indigo-700 transition-colors flex gap-3">
@@ -374,18 +384,18 @@ const Navbar = () => {
                           </p>
                           <p className="text-xs text-gray-500 mt-1">Preferences</p>
                         </div>
-                      </Link>
+                      </Link> */}
                       </div>
 
-                      {/* <div className="border-t border-gray-300"> */}
-                        {/* <button
-                          onClick={handleLogOut}
-                          className="cursor-pointer w-full text-left px-5 py-2.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                        >
-                          <LogOut className="h-5 w-5 inline-block mr-2" />
-                          Log out
-                        </button> */}'
+                      <div className="border-t border-gray-300">
                         <button
+                          onClick={handleLogOut}
+                          className="flex mt-2 gap-3 cursor-pointer items-center font-medium w-full px-5 py-2 text-red-600 hover:bg-red-100 transition-colors"
+                        >
+                          <LogOut className="h-7 w-7" />
+                          Log out
+                        </button>
+                        {/* <button
                         onClick={handleLogOut}
                         className="cursor-pointer border-t border-gray-300 w-full text-left px-5 py-2 text-red-600 hover:bg-red-100 transition-colors flex gap-3">
                         <div className="flex-shrink-0">
@@ -397,10 +407,10 @@ const Navbar = () => {
                           </p>
                           <p className="text-xs text-gray-500 mt-1">Sign out of your account</p>
                         </div>
-                      </button>
+                      </button> */}
                         
                       </div>
-                    // </div>
+                     </div>
                   )}
                 </div>
               )}

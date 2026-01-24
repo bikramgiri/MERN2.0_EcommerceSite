@@ -10,13 +10,11 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { Status } from "../../../globals/statuses";
-import { AddToFavorite } from "../../../store/userFavouriteSlice";
+import { AddToFavorite, removeFavorite } from "../../../store/userFavouriteSlice";
 
 const Product = () => {
   const dispatch = useAppDispatch();
-  const { product: products = [], status } = useAppSelector(
-    (state) => state.product,
-  );
+  const { product: products = [], status } = useAppSelector((state) => state.product);
   const { userFavorite: favorites } = useAppSelector((state) => state.favorite);
 
   const filterModalRef = useRef<HTMLDialogElement>(null);
@@ -94,6 +92,14 @@ const Product = () => {
     searchBrand,
   ]);
 
+    if (!products || products.length === 0) {
+    return (
+      <div className="text-center py-20 text-xl text-red-600 min-h-[70vh] flex items-center justify-center">
+        Product not found
+      </div>
+    );
+  }
+
   // Loading State
   if (status === Status.LOADING) {
     return (
@@ -167,95 +173,107 @@ const Product = () => {
         {/* Product Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {currentItems.length > 0 ? (
-            currentItems.map((product) => (
-              <div
-                key={product.id}
-                className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg hover:border-indigo-300"
-              >
-                <Link to={`/productdetails/${product.id}`} key={product.id}>
-                  <div className="relative h-56 overflow-hidden bg-gray-100">
-                    <img
-                      src={product.productImage}
-                      alt={product.productName}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {product.discount && (
-                      <span className="absolute left-3 top-3 rounded-full bg-indigo-600 px-3 py-1 text-xs font-bold text-white">
-                        {product.discount}% OFF
-                      </span>
-                    )}
-                  </div>
+            currentItems.map((product) => {
+              // Check if this specific product is favorited
+              const isFavorited = favorites.some(
+                (fav) => fav.id === product.id,
+              );
 
-                  <div className="p-5">
-                    <h3 className="mb-2 text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-indigo-700">
-                      {product.productName}
-                    </h3>
+              // Toggle handler for this product
+              const handleFavoriteToggle = () => {
+                if (isFavorited) {
+                  dispatch(removeFavorite(product.id));
+                } else {
+                  dispatch(AddToFavorite({ id: product.id }));
+                }
+              };
 
-                    <div className="flex items-center mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <svg
-                          key={i}
-                          className="h-5 w-5 text-amber-500"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        //     <Star key={i} className="h-4 w-4 text-amber-500" />
-                      ))}
-                      <span className="text-sm font-medium text-gray-700">
-                        4.8
-                      </span>
-                      <span className="text-sm text-gray-500">(124)</span>
-                    </div>
-
-                    <div className="mb-3 flex items-center gap-2">
-                      <span className="text-xl font-bold text-indigo-700">
-                        Rs {product.productPrice}
-                      </span>
-                      {product.oldPrice && (
-                        <span className="text-sm text-gray-600 line-through">
-                          Rs {product.oldPrice}
+              return (
+                <div
+                  key={product.id}
+                  className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg hover:border-indigo-300"
+                >
+                  <Link to={`/productdetails/${product.id}`} key={product.id}>
+                    <div className="relative h-56 overflow-hidden bg-gray-100">
+                      <img
+                        src={product.productImage}
+                        alt={product.productName}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {product.discount && (
+                        <span className="absolute left-3 top-3 rounded-full bg-indigo-600 px-3 py-1 text-xs font-bold text-white">
+                          {product.discount}% OFF
                         </span>
                       )}
                     </div>
-                  </div>
-                </Link>
-                <div className="p-5 border-t gap-4 border-gray-300 flex justify-between">
-                  <button
-                    type="button"
-                    disabled={product.productTotalStockQty === 0}
-                    className="cursor-pointer gap-2 flex items-center justify-center rounded-xl px-9 py-3 text-base font-semibold text-white bg-indigo-700 hover:bg-indigo-800 transition-colors"
-                  >
-                    <ShoppingCart className="w-6 h-6" />
-                    Add
-                  </button>
-                  {/* <button
+
+                    <div className="p-5">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-indigo-700">
+                        {product.productName}
+                      </h3>
+
+                      <div className="flex items-center mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <svg
+                            key={i}
+                            className="h-5 w-5 text-amber-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          //     <Star key={i} className="h-4 w-4 text-amber-500" />
+                        ))}
+                        <span className="text-sm font-medium text-gray-700">
+                          4.8
+                        </span>
+                        <span className="text-sm text-gray-500">(124)</span>
+                      </div>
+
+                      <div className="mb-3 flex items-center gap-2">
+                        <span className="text-xl font-bold text-indigo-700">
+                          Rs {product.productPrice}
+                        </span>
+                        {product.oldPrice && (
+                          <span className="text-sm text-gray-600 line-through">
+                            Rs {product.oldPrice}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                  <div className="p-5 border-t gap-4 border-gray-300 flex justify-between">
+                    <button
+                      type="button"
+                      disabled={product.productTotalStockQty === 0}
+                      className="cursor-pointer gap-2 flex items-center justify-center rounded-xl px-9 py-3 text-base font-semibold text-white bg-indigo-700 hover:bg-indigo-800 transition-colors"
+                    >
+                      <ShoppingCart className="w-6 h-6" />
+                      Add
+                    </button>
+                    {/* <button
               type="button"
               className="cursor-pointer flex items-center justify-center rounded-xl px-8 py-2 text-base font-semibold text-indigo-700 border-2 border-indigo-700 hover:bg-indigo-50 transition-colors"
             >
               <Heart className="w-6 h-6" />
             </button> */}
-                  <button
-                    onClick={() => dispatch(AddToFavorite({ id: product.id }))}
-                    className={`cursor-pointer flex items-center justify-center rounded-xl px-8 py-2 text-base font-semibold border-2 border-indigo-700 transition-colors ${
-                      favorites.some((fav) => fav.id === product.id)
-                        ? "text-red-500 border-indigo-700  "
-                        : "text-gray-500 hover:text-red-500 hover:bg-red-50 hover:border-red-700 "
-                    }`}
-                  >
-                    <Heart
-                      className="w-6 h-6"
-                      fill={
-                        favorites.some((fav) => fav.id === product.id)
-                          ? "currentColor"
-                          : "none"
-                      }
-                    />
-                  </button>
+                    <button
+                      onClick={handleFavoriteToggle}
+                      className={`cursor-pointer flex items-center justify-center rounded-xl px-8 py-2 text-base font-semibold border-2 transition-colors ${
+                        isFavorited
+                          ? "text-red-500 border-red-700 bg-red-50  "
+                          : "text-indigo-600 border-indigo-700 hover:text-red-500 hover:bg-red-50 hover:border-red-600"
+                      }`}
+                    >
+                      <Heart
+                        className="w-6 h-6"
+                        fill={isFavorited ? "currentColor" : "none"}
+                      />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-center text-gray-500 col-span-full">
               No products match the selected filters.
