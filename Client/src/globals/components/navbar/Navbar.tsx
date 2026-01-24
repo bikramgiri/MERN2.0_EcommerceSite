@@ -6,6 +6,7 @@ import { logOut } from "../../../store/authSlice";
 import { CgProfile } from "react-icons/cg";
 import { GrDashboard } from "react-icons/gr";
 import { fetchUserFavorites } from "../../../store/userFavouriteSlice";
+import { fetchCartItems } from "../../../store/cartSlice";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);           // mobile menu
@@ -18,9 +19,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, token } = useAppSelector((state) => state.auth);
   const { userFavorite: favorites } = useAppSelector(state => state.favorite);
+  const { items } = useAppSelector(state => state.cart);
 
   // Dynamic values (replace with real Redux selectors later if needed)
-  const cartCount = 3; 
+  const cartCount = items.length; 
   // const unreadNotifications = 2;   
   const favouritesCount = favorites.length;       
   
@@ -37,6 +39,12 @@ const Navbar = () => {
   useEffect(() => {
     if (effectiveToken) {
       dispatch(fetchUserFavorites());
+    }
+  }, [effectiveToken, dispatch]);
+
+    useEffect(() => {
+    if (effectiveToken) {
+      dispatch(fetchCartItems());
     }
   }, [effectiveToken, dispatch]);
 
@@ -215,6 +223,7 @@ const Navbar = () => {
             )} */}
 
             {isLoggedIn && (
+              <>
               <Link
                 to="/favorites"
                 className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
@@ -233,14 +242,31 @@ const Navbar = () => {
                   <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                     0
                   </span>
-
                 ) }
 
               </Link>
+
+                 <Link
+              to="/cart"
+              className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
+            >
+              <ShoppingCart className="h-6 w-6" />
+              {cartCount > 0 ? (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {cartCount}
+                  </span>
+                ) : (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    0
+                  </span>
+              )}
+            </Link>
+            </>
             )}
 
             {/* Cart (always visible) */}
-            <Link
+            {/* {isLoggedIn && (
+              <Link
               to="/cart"
               className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
             >
@@ -251,6 +277,7 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
+            )} */}
 
             {/* Desktop - Auth / User Dropdown */}
             <div className="hidden md:flex items-center gap-3">

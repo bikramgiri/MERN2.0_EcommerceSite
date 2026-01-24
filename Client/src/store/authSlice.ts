@@ -121,7 +121,6 @@ export function loginUser(data: loginData) {
       const response = await API.post("/auth/login", data);
       console.log("Login Response:", response.data); // Debug response
       if (response.status === 200) {
-        console.log("Login token:", response.data.token);
          dispatch(setUser(response.data.data));
          localStorage.setItem("user", JSON.stringify(response.data.data));
          dispatch(setToken(response.data.token));

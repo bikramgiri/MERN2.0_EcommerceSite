@@ -6,6 +6,7 @@ import { BsMessenger, BsWhatsapp } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { Status } from "../../../../globals/statuses";
 import { AddToFavorite, removeFavorite } from "../../../../store/userFavouriteSlice";
+import { addToCart } from "../../../../store/cartSlice";
 
 interface SingleProductProps {
   productId: string;
@@ -15,7 +16,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { singleProduct, status } = useAppSelector((state) => state.product);
-    const { userFavorite: favorites } = useAppSelector((state) => state.favorite);
+  const { userFavorite: favorites } = useAppSelector((state) => state.favorite);
 
   // Local state for quantity
   const [quantity, setQuantity] = useState(1);
@@ -34,6 +35,12 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
     } else if (type === "decrease" && quantity > 1) {
       setQuantity((prev) => prev - 1);
     }
+  };
+
+    const handleAddToCart = () => {
+    if(productId && singleProduct){
+      dispatch(addToCart(productId));
+  };
   };
 
   // if (status === "loading") {
@@ -200,6 +207,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
             <div className="flex flex-col sm:flex-row gap-8">
               <button
                 type="button"
+                onClick={handleAddToCart}
                 disabled={singleProduct.productTotalStockQty === 0}
                 className="cursor-pointer flex-1 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center rounded-xl px-8 py-4 text-base font-semibold text-white bg-indigo-700 hover:bg-indigo-800 transition-colors shadow-md"
               >
