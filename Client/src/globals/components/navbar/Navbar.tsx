@@ -72,6 +72,33 @@ const Navbar = () => {
     navigate("/login?logout=true");
   };
 
+
+  // Helper to render avatar or initials
+  const renderAvatar = (size: "small" | "large") => {
+    const avatarSize = size === "small" ? "w-10 h-10" : "w-12 h-12";
+    const textSize = size === "small" ? "text-xl" : "text-2xl";
+
+    if (user?.avatar) {
+      return (
+        <img
+          className={`${avatarSize} rounded-full object-cover border-2 border-indigo-200`}
+          src={user.avatar}
+          alt="User avatar"
+        />
+      );
+    }
+
+    const initials = user?.username?.charAt(0).toUpperCase() || "U";
+
+    return (
+      <div
+        className={`${avatarSize} rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold border-2 border-indigo-200 ${textSize}`}
+      >
+        {initials}
+      </div>
+    );
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md border-b border-gray-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -250,26 +277,18 @@ const Navbar = () => {
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="flex items-center gap-2 cursor-pointer focus:outline-none"
                   >
-                    <img
-                      className="w-10 h-10 rounded-full object-cover border-2 border-indigo-200"
-                      src={user?.avatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
-                      alt="User avatar"
-                    />
+                    {renderAvatar("small")}
                   </button>
 
                   {/* Dropdown Menu */}
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-md shadow-xl border border-gray-300 py-2 z-50">
+                    <div className="absolute right-0 mt-3 w-66 bg-white rounded-md shadow-xl border border-gray-300 py-2 z-50">
                       <div className="px-5 py-4 border-b border-gray-300">
                         <div className="flex items-center gap-3">
-                          <img
-                            className="w-12 h-12 rounded-full object-cover"
-                            src={user?.avatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
-                            alt="User avatar"
-                          />
+                          {renderAvatar("large")}
                           <div>
-                            <p className="font-medium text-gray-900">{user?.username || "User"}</p>
-                            <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+                            <p className="font-medium text-gray-900">{user?.username || "My Account"}</p>
+                            <p className="text-sm text-gray-600 truncate">{user?.email || "user@example.com"}</p>
                           </div>
                         </div>
                       </div>

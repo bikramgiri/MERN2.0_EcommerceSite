@@ -43,8 +43,10 @@ interface AuthState{
       email: string
 }
 
+const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
 const initialState: AuthState = {
-  user : {} as User,
+  user : storedUser ? JSON.parse(storedUser) : {} as User,
   status: Status.IDLE,
       token: "",
   // token: localStorage.getItem("token") || "", // Load on init
@@ -121,6 +123,7 @@ export function loginUser(data: loginData) {
       if (response.status === 200) {
         console.log("Login token:", response.data.token);
          dispatch(setUser(response.data.data));
+         localStorage.setItem("user", JSON.stringify(response.data.data));
          dispatch(setToken(response.data.token));
          dispatch(setStatus(Status.SUCCESS));
       }
