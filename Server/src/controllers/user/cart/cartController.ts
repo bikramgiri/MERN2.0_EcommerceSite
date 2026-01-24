@@ -12,33 +12,39 @@ class CartController {
     if (!userId) {
       res.status(401).json({
         message: "Unauthorized! User not found",
+        field: "user",
       });
       return;
     }
 
-    const { quantity, productId } = req.body;
-    if (!quantity || !productId) {
+    const { productId } = req.body;
+    if (!productId) {
       res.status(400).json({
-        message: "Please provide quantity and productId",
+        message: "Please provide productId",
+        field: "productId",
       });
       return;
     }
 
-    // validate quantity
-    if (quantity <= 0) {
-      res.status(400).json({
-        message: "Quantity must be greater than zero",
+    // Product existence check
+    const product = await Product.findByPk(productId
+      // ,{attributes: ["id", "productName", "productPrice", "productTotalStockQty"],}
+    );
+    if (!product) {
+      res.status(404).json({
+        message: "Product not found",
+        field: "productId",
       });
       return;
     }
 
     // check if the product is already in the cart or not
-    const existingCartItem = await Cart.findOne({
-      where: { productId },
+    const existingCartItem = await Cart.findOne({  
+      where: { productId, userId },
       include: [
         {
           model: Product,
-          attributes: ["id", "productName"],
+          attributes: ["id", "productName", "productPrice", "productTotalStockQty"],
         },
         {
           model: User,
@@ -51,19 +57,26 @@ class CartController {
       // if exists, increase the quantity by 1
       existingCartItem.quantity += 1;
       await existingCartItem.save();
+
+      res.status(200).json({
+      message: "Cart item quantity increased",
+      data: existingCartItem,
+    });
+    return;
     } 
-    // else {
-      // if not exists, create a new cart item
-      const newCartItem = await Cart.create({
-        userId: userId!,
-        productId,
-        quantity,
+    
+    const newCartItem = await Cart.create({
+        userId: userId, 
+        productId: productId,
+        quantity: 1,
       });
-    // }
 
     res.status(201).json({
       message: "Product added to cart successfully",
-      data: newCartItem,
+      data: { 
+        ...newCartItem.toJSON(),
+        product: product
+      }
     });
     return;
   }
@@ -98,12 +111,13 @@ class CartController {
         },
       ],
     });
-    if (!cartItems || cartItems.length === 0) {
-      res.status(404).json({
-        message: "No items found in cart",
-      });
-      return;
-    }
+    // if (!cartItems || cartItems.length === 0) {
+    //   res.status(404).json({
+    //     message: "No items found in cart",
+    //     data: [],
+    //   });
+    //   return;
+    // }
 
     res.status(200).json({
       message: "Cart items fetched successfully",
@@ -153,6 +167,7 @@ class CartController {
     if (!userId) {
       res.status(401).json({
         message: "Unauthorized! User not found",
+        field: "user",
       });
       return;
     }
@@ -161,6 +176,7 @@ class CartController {
     if (!productId) {
       res.status(400).json({
         message: "Please provide productId",
+        field: "productId",
       });
       return;
     }
@@ -169,6 +185,7 @@ class CartController {
     if (!quantity) {
       res.status(400).json({
         message: "Please provide quantity",
+        field: "quantity",
       });
       return;
     }
@@ -177,6 +194,7 @@ class CartController {
     if (quantity <= 0) {
       res.status(400).json({
         message: "Quantity must be greater than zero",
+        field: "quantity",
       });
       return;
     }
@@ -185,12 +203,14 @@ class CartController {
     if (!cartItem) {
       res.status(404).json({
         message: "Cart item not found",
+        data: [],
       });
       return;
     }
 
     cartItem.quantity = quantity;
     await cartItem.save();
+
     res.status(200).json({
       message: "Cart item updated successfully",
       data: cartItem,

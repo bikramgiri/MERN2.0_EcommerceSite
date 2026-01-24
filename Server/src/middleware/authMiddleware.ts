@@ -6,7 +6,7 @@ export interface AuthRequest extends Request {
   user?: {
     username: string;
     email: string;
-    password: string;
+    // password: string;
     role: string;
     id: string;
     favoriteProducts?: string[];
@@ -26,16 +26,24 @@ class authMiddleware {
     next: NextFunction,
   ): Promise<void> {
     try {
-      // get token from headers
-      const token = req.headers.authorization;
-      if (!token || !token.startsWith("Bearer") || token === undefined) {
+      let token: string | undefined;
+      const authHeader = req.headers.authorization;
+
+
+      if (authHeader) {
+        if (authHeader.startsWith("Bearer ")) {
+          token = authHeader.substring(7); // Remove "Bearer " prefix
+        } else {
+          token = authHeader; // Accept plain token (common in Postman manual header)
+        }
+      }
+
+      if (!token) {
         res.status(401).json({
           message: "No token provided",
         });
         return;
       }
-
-      const splitToken = token.split(" ")[1];
 
       const secret = process.env.JWT_SECRET_KEY;
       if (!secret) {
@@ -76,8 +84,8 @@ class authMiddleware {
 
       // verify token
       jwt.verify(
-        splitToken as string,
-        process.env.JWT_SECRET_KEY as string,
+        token,
+        secret,
         async (err, decoded: any) => {
           if (err) {
             console.error("JWT verification failed:", {
