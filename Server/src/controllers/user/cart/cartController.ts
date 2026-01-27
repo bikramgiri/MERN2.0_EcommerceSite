@@ -90,18 +90,16 @@ class CartController {
       });
       return;
     }
-
     const cartItems = await Cart.findAll({
       where: { userId },
-      // attributes: ["id", "quantity", "productName", "productPrice", "productTotalStockQty"],
       include: [
         {
-          model: Product,
-          attributes: ["id", "productName", "productPrice", "productTotalStockQty"],
+          model: Product ,
+          attributes: ["id", "productName", "productPrice", "productTotalStockQty", "productImage"],
           include: [
             {
               model: Category,
-              attributes: ["id", "categoryName"],
+              attributes: ["id", "categoryName"], 
             },
           ],
         },
@@ -181,34 +179,42 @@ class CartController {
       return;
     }
 
-    const { quantity } = req.body;
-    if (!quantity) {
-      res.status(400).json({
-        message: "Please provide quantity",
-        field: "quantity",
-      });
-      return;
-    }
+    // Safe access to body
+  if (!req.body || typeof req.body !== "object") {
+    res.status(400).json({
+      message: "Invalid request body",
+    });
+    return;
+  }
 
-    // validate quantity
-    if (quantity <= 0) {
-      res.status(400).json({
-        message: "Quantity must be greater than zero",
-        field: "quantity",
-      });
-      return;
-    }
+  const quantity = req.body.quantity;
+  if (quantity == null) { // null or undefined
+    res.status(400).json({
+      message: "Please provide quantity",
+      field: "quantity",
+    });
+    return;
+  }
 
-    const cartItem = await Cart.findOne({ where: { userId, productId } });
+   const numQuantity = Number(quantity);
+  if (isNaN(numQuantity) || numQuantity <= 0 || !Number.isInteger(numQuantity)) {
+    res.status(400).json({
+      message: "Quantity must be a positive integer",
+    });
+    return;
+  }
+
+    // check whether the product exists in the cart or not
+    const cartItem = await Cart.findOne({ where: { userId, productId } });  
     if (!cartItem) {
       res.status(404).json({
         message: "Cart item not found",
-        data: [],
+        // data: [],
       });
       return;
     }
 
-    cartItem.quantity = quantity;
+    cartItem.quantity = numQuantity;
     await cartItem.save();
 
     res.status(200).json({
@@ -227,7 +233,7 @@ class CartController {
       return;
     }
 
-     const { id: productId } = req.params; // ← safe destructuring
+     const productId = req.params.id; // ← safe destructuring
 
       // Type guard
       if (!productId || typeof productId !== 'string' || productId.trim() === '') {
@@ -236,13 +242,13 @@ class CartController {
       }
 
     // check whether the product exists in the cart or not
-    const existingProduct = await Cart.findByPk(productId);
-    if (!existingProduct) {
-      res.status(404).json({
-        message: "Product not found in cart",
-      });
-      return;
-    }
+    // const existingProduct = await Cart.findByPk(productId);
+    // if (!existingProduct) {
+    //   res.status(404).json({
+    //     message: "Product not found in cart",
+    //   });
+    //   return;
+    // }
 
     const cartItem = await Cart.findOne({ where: { userId, productId } });
     if (!cartItem) {

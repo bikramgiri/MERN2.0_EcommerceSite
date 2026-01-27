@@ -10,7 +10,7 @@ router.route('/cart')
 
 router.route('/cart/:id')
 .get(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), catchAsyncError(cartController.getSingleCartItem))
-.patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), catchAsyncError(cartController.updateCartItem))
+.patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), cartController.updateCartItem)
 .delete(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), catchAsyncError(cartController.deleteCartItem));
 
 export default router;

@@ -5,6 +5,13 @@ import { AuthRequest } from "../../middleware/authMiddleware";
 import Category from "../../models/categoryModel";
 
 class UserController {
+  private static readonly CLOUDINARY_BASE_URL =
+    "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
+
+  private static getFullImageUrl(fileName: string | undefined): string {
+    if (!fileName) return "/placeholder.jpg";
+    return `${this.CLOUDINARY_BASE_URL}${fileName}`;
+  }
   // Add to Favorites
   public static async AddToFavorite(
     req: AuthRequest,
@@ -49,17 +56,28 @@ class UserController {
         });
       } else {
         await user.$add("FavoritedProducts", product);
-        // res.status(200).json({
-        //   message: "Added to favorites",
-        //   isFavorite: true
-        // });
+        // Transform product to include full image URL
+        const plainProduct = product.toJSON();
+        const productWithFullImage = {
+          ...plainProduct,
+          productImage: UserController.getFullImageUrl(plainProduct.productImage),
+        };
+
         res.status(200).json({
-          message: isFavorited
-            ? "Removed from favorites"
-            : "Added to favorites",
-          isFavorite: !isFavorited,
-          data: product, // ← return the Product instance
+          message: "Added to favorites",
+          isFavorite: true,
+          data: productWithFullImage, // ← return the Product instance
         });
+
+        // *OR
+
+        // res.status(200).json({
+        //   message: isFavorited
+        //     ? "Removed from favorites"
+        //     : "Added to favorites",
+        //   isFavorite: !isFavorited,
+        //   data: productWithFullImage, // ← return the Product instance
+        // });
       }
     } catch (error: any) {
       console.error("AddToFavorite error:", error);
@@ -103,10 +121,22 @@ class UserController {
         return;
       }
 
+     const favoriteProducts = ((user as any).FavoritedProducts || []).map((p: any) => p.toJSON());
+
+      // Transform each favorite product to include full Cloudinary URL
+      const favoritesWithFullImage = favoriteProducts.map((plain: any) => ({
+        ...plain,
+        productImage: UserController.getFullImageUrl(plain.productImage),
+      }));
+
       res.status(200).json({
         message: "Favorite products fetched successfully",
-        data: (user as any).FavoritedProducts || [], // ← safe access
+        // data: (user as any).FavoritedProducts || [], // ← safe access
         // count: user.FavoritedProducts?.length || 0
+
+        // *OR
+        data: favoritesWithFullImage,
+        // count: favoritesWithFullImage.length || 0,
       });
     } catch (error: any) {
       console.error("getFavoriteProducts error:", error);

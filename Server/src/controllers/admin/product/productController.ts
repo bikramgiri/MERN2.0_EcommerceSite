@@ -8,8 +8,17 @@ import Payment from "../../../models/paymentModel";
 import OrderDetail from "../../../models/orderDetailsModel";
 import { cloudinary } from "../../../cloudinary";
 const fs = require("fs");
-
+  
 class ProductController {
+private static readonly CLOUDINARY_BASE_URL =
+    "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
+
+  // Helper to get full URL from stored filename
+  private static getFullImageUrl(fileName: string | undefined): string {
+    if (!fileName) return "/placeholder.jpg";
+    return `${this.CLOUDINARY_BASE_URL}${fileName}`;
+  }
+
   // *Create Product
   public static async addProduct(
     req: AuthRequest,
@@ -124,13 +133,21 @@ class ProductController {
         userId: userId,
         categoryId: categoryId,
       });
+
+      // Send full URL in response
+    const responseProduct = {
+      ...newProduct.toJSON(),
+      productImage: productImage,
+    };
+
       res.status(201).json({
         message: "Product created successfully",
-        data: newProduct,
-        product: {
-          // ...newProduct.get({ plain: true }),
-          productImage: productImage, // ← full URL for client
-        },
+        // data: newProduct,
+        // product: {
+        //   productImage: productImage, // ← full URL for client= https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/ngufnfy7t56skpaxj6uj.png
+        // },
+        // *OR
+        data: responseProduct,
       });
     } catch (error: any) {
       res.status(500).json({
@@ -145,6 +162,16 @@ class ProductController {
     req: Request,
     res: Response
   ): Promise<void> {
+
+    //   // *Get Cloudinary result from middleware
+    // const cloudinaryResult = (req as any).cloudinaryResult;
+    // if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+    //   res.status(500).json({ message: "Image upload failed" });
+    //   return;
+    // }
+
+    // const productImage = cloudinaryResult.secure_url; // full HTTPS URL
+
     try {
       const products = await Product.findAll({
         include: [
@@ -158,9 +185,33 @@ class ProductController {
           },
         ],
       });
+
+    //   // Construct full Cloudinary URLs
+    // const baseUrl = "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
+    // const productsWithFullImage = products.map((p) => {
+    //   const plain = p.toJSON();
+    //   return {
+    //     ...plain,
+    //     productImage: plain.productImage ? `${baseUrl}${plain.productImage}` : "/placeholder.jpg",
+    //   };
+    // });
+
+    // *OR
+
+    const productsWithFullImage = products.map((p) => {
+        const plain = p.toJSON();
+        return {
+          ...plain,
+          productImage: ProductController.getFullImageUrl(plain.productImage),
+        };
+      });
+
       res.status(200).json({
         message: "Products fetched successfully",
-        data: products,
+        data: productsWithFullImage,
+        // product: {
+        //   productImage: productImage, // ← full URL for client
+        // },
       });
     } catch (error: any) {
       res.status(500).json({
@@ -173,12 +224,25 @@ class ProductController {
   // Get single product
   public static async getSingleProduct(req: Request,res: Response): Promise<void> {
     try {
-      const productId = req.params.id;  
+      const productId = req.params.id;
       // Type guard
-      if (!productId || typeof productId !== 'string' || productId.trim() === '') {
+      if (
+        !productId ||
+        typeof productId !== "string" ||
+        productId.trim() === ""
+      ) {
         res.status(400).json({ message: "Valid Product ID is required" });
         return;
       }
+
+      // // *Get Cloudinary result from middleware
+      // const cloudinaryResult = (req as any).cloudinaryResult;
+      // if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+      //   res.status(500).json({ message: "Image upload failed" });
+      //   return;
+      // }
+
+      // const productImage = cloudinaryResult.secure_url; // full HTTPS URL
 
       const product = await Product.findByPk(productId, {
         include: [
@@ -198,9 +262,29 @@ class ProductController {
         });
         return;
       }
+
+    // // Construct full Cloudinary URL
+    // const baseUrl = "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
+    // const plainProduct = product.toJSON();
+    // const productWithFullImage = {
+    //   ...plainProduct,
+    //   productImage: plainProduct.productImage ? `${baseUrl}${plainProduct.productImage}` : "/placeholder.jpg",
+    // };
+
+    // *OR
+
+    const plainProduct = product.toJSON();
+      const productWithFullImage = {
+        ...plainProduct,
+        productImage: ProductController.getFullImageUrl(plainProduct.productImage),
+      };
+
       res.status(200).json({
         message: "Product fetched successfully",
-        data: product,
+        data: productWithFullImage,
+        // product: {
+        //   productImage: productImage, // ← full URL for client
+        // },
       });
     } catch (error: any) {
       res.status(500).json({
@@ -235,7 +319,7 @@ class ProductController {
         return;
       }
 
-      let productImage = product.productImage;
+      // let productImage = product.productImage;
 
       // validate productName length must be greater than 2
       if (productName.trim().length < 2) {
@@ -306,6 +390,10 @@ class ProductController {
       // }
 
       // *For Cloudinary: update product image only if a new image is uploaded
+      let fileName = product.productImage; // Keep old filename
+      let productImage = ProductController.getFullImageUrl(fileName); // Default full URL
+
+      // Handle new image upload
       const cloudinaryResult = (req as any).cloudinaryResult;
       if (cloudinaryResult && cloudinaryResult.secure_url) {
         // Delete old image from Cloudinary
@@ -320,24 +408,32 @@ class ProductController {
         });
 
         productImage = cloudinaryResult.secure_url; // update to new image URL
+        fileName = productImage.split('/').pop() || ''; // update to new filename
       }
 
-      const finalName = productImage.split('/').pop() || '';
+      // const finalName = productImage.split('/').pop() || '';
 
       const updatedProduct = await product.update({
-        productName: productName,
-        productImage: finalName,
-        productDescription: productDescription,
-        productPrice: productPrice,
-        productTotalStockQty: productTotalStockQty,
+        productName: productName || product.productName,
+        productImage: fileName,
+        productDescription: productDescription || product.productDescription,
+        productPrice: productPrice || product.productPrice,
+        productTotalStockQty: productTotalStockQty || product.productTotalStockQty,
         categoryId: categoryId,
       });
+
+      const responseProduct = {
+        ...updatedProduct.toJSON(),
+        productImage: productImage, // Send full URL
+      };
+
       res.status(200).json({
         message: "Product updated successfully",
-        data: updatedProduct,
-        product: {
-          productImage: productImage, // ← full URL for client
-        },
+        data: responseProduct,
+        // data: updatedProduct,
+        // product: {
+        //   productImage: productImage, // ← full URL for client
+        // },
       });
     } catch (error: any) {
       res.status(500).json({
@@ -383,8 +479,8 @@ class ProductController {
       // });
 
       // *For Cloudinary: Delete image from Cloudinary
-      const ImageName = product.productImage.split('/').pop() || '';
-      cloudinary.uploader.destroy(ImageName, (error: any, result: any) => {
+      const fileName = product.productImage.split('/').pop() || '';
+      cloudinary.uploader.destroy(fileName, (error: any, result: any) => {
         if (error) {
           console.error("Error deleting image from Cloudinary:", error);
         } else {
@@ -393,6 +489,7 @@ class ProductController {
       });
 
       await product.destroy();
+
       res.status(200).json({
         message: "Product deleted successfully",
       });

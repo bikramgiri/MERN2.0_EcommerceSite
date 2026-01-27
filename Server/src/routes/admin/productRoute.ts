@@ -7,7 +7,7 @@ import authMiddleware, { Role } from '../../middleware/authMiddleware';
 const router:Router = express.Router();
 
 router.route('/product')
-.post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), upload.single('productImage'), cloudinaryUpload, catchAsyncError(ProductController.addProduct))
+.post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Admin), upload.single('productImage'), cloudinaryUpload, ProductController.addProduct)
 .get(catchAsyncError(ProductController.getAllProducts));
 
 router.route('/product/:id')
