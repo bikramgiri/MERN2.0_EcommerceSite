@@ -203,7 +203,7 @@ const Register = () => {
         setTimeout(() => {
           setMessage("");
           navigate("/login");
-        }, 4000);
+        }, 2000);
       }, 0);
       dispatch(resetAuthStatus());
     } else if (status === Status.ERROR) {

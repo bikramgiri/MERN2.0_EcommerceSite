@@ -118,9 +118,7 @@ export function loginUser(data: loginData) {
   return async function loginUserThunk(dispatch: AppDispatch) {
     dispatch(setStatus(Status.LOADING));
     try {
-      const response = await API.post("/auth/login", data);
-      console.log("Login Response:", response.data); // Debug response
-      if (response.status === 200) {
+      const response = await API.post("/auth/login", data);      if (response.status === 200) {
          dispatch(setUser(response.data.data));
          localStorage.setItem("user", JSON.stringify(response.data.data));
          dispatch(setToken(response.data.token));

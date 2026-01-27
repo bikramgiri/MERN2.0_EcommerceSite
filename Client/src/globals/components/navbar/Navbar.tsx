@@ -21,15 +21,13 @@ const Navbar = () => {
   const { userFavorite: favorites } = useAppSelector(state => state.favorite);
   const { items } = useAppSelector(state => state.cart);
 
-  // Dynamic values (replace with real Redux selectors later if needed)
-  const cartCount = items.length; 
-  // const unreadNotifications = 2;   
-  const favouritesCount = favorites.length;       
+  const cartCount = items?.length;
+ // *OR
+  // const totalItems = items.reduce((total, item) => total + item.quantity, 0);
   
-
-    // Check login status (most reliable way)
-  // const isLoggedIn = !!token || !!user?.token;
-
+  // const unreadNotifications = 2;   
+  const favouritesCount = favorites?.length;       
+ 
   // Check token in localStorage for persistent login state on refresh
   const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const effectiveToken = token || storedToken;
@@ -246,9 +244,8 @@ const Navbar = () => {
 
               </Link>
 
-                 <Link
-              to="/cart"
-              className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
+            <div {...(items?.length > 0 ? { onClick: () => navigate("/cart") } : {})}
+              className="cursor-pointer relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
             >
               <ShoppingCart className="h-6 w-6" />
               {cartCount > 0 ? (
@@ -260,7 +257,7 @@ const Navbar = () => {
                     0
                   </span>
               )}
-            </Link>
+            </div>
             </>
             )}
 

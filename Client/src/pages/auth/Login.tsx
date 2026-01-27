@@ -201,10 +201,9 @@ const Login = () => {
         setTimeout(() => {
           setMessage("");
           navigate("/login", { replace: true });
-        }, 2000);
+        }, 1000);
       }, 0); 
       dispatch(resetAuthStatus());
-      console.log("Status Changed to:", status);
     }
   }, [navigate, status, errors, token, dispatch]);
 

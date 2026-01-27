@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchSingleProduct } from "../../../../store/productSlice";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/hooks";
-import { ArrowLeft, Facebook, Heart, Loader2, Minus, Plus } from "lucide-react";
+import { ArrowLeft, Facebook, Heart, Loader2, Minus, Plus} from "lucide-react";
 import { BsMessenger, BsWhatsapp } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { Status } from "../../../../globals/statuses";
 import { AddToFavorite, removeFavorite } from "../../../../store/userFavouriteSlice";
-import { addToCart } from "../../../../store/cartSlice";
+import { addToCart, updateCartItems } from "../../../../store/cartSlice";
 
 interface SingleProductProps {
   productId: string;
@@ -16,10 +16,10 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { singleProduct, status } = useAppSelector((state) => state.product);
-  const { userFavorite: favorites } = useAppSelector((state) => state.favorite);
 
-  // Local state for quantity
-  const [quantity, setQuantity] = useState(1);
+  const { userFavorite: favorites } = useAppSelector((state) => state.favorite);
+    const { items: cartItems = [] } = useAppSelector((state) => state.cart);
+    console.log("Cart Items in Single Product:", cartItems);
 
   useEffect(() => {
     if (productId && productId !== "undefined") {
@@ -29,19 +29,123 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
     }
   }, [dispatch, productId]);
 
-  const handleQuantityChange = (type: "increase" | "decrease") => {
-    if (type === "increase") {
-      setQuantity((prev) => prev + 1);
-    } else if (type === "decrease" && quantity > 1) {
-      setQuantity((prev) => prev - 1);
+  // const handleQuantityChange = (type: "increase" | "decrease") => {
+  //   if (type === "increase") {
+  //     setQuantity((prev) => prev + 1);
+  //   } else if (type === "decrease" && quantity > 1) {
+  //     setQuantity((prev) => prev - 1);
+  //   }
+  // };
+
+  // *OR
+
+  // // Current quantity in cart for this product
+  // const currentItem = cartItems.find((i) => i.productId === productId);
+  // const currentQuantity = currentItem ? currentItem.quantity : 0;
+
+  // // Display 1 when not in cart (for preview), otherwise show actual cart quantity
+  // const displayQuantity = currentQuantity > 0 ? currentQuantity : 1;
+
+  // const handleIncrease = () => {
+  //   dispatch(addToCart(productId));
+  // };
+
+  // const handleDecrease = () => {
+  //   if (currentQuantity > 1) {
+  //     dispatch(updateCartItems({ ...currentItem!, quantity: currentQuantity - 1 }));
+  //   } else if (currentQuantity === 1) {
+  //     dispatch(removeFromCart(productId));
+  //   }
+  // };
+
+  // *OR
+    // Local state for quantity
+  const [localQuantity, setLocalQuantity] = useState(1);
+
+  // Sync local quantity with cart when product loads or cart changes
+  useEffect(() => {
+    const existingItem = cartItems.find((i) => i.productId === productId);
+    if (existingItem) {
+      setTimeout(() => {
+        setLocalQuantity(existingItem.quantity);
+      }, 0); // slight delay for better UX
+    } else {
+      setTimeout(() => {
+        setLocalQuantity(1);
+      }, 0); // reset to 1 if not in cart
+    }
+  }, [cartItems, productId]);
+
+  const handleIncrease = () => {
+    if (singleProduct && localQuantity < singleProduct.productTotalStockQty) {
+      setLocalQuantity((prev) => prev + 1);
     }
   };
 
+  const handleDecrease = () => {
+    if (localQuantity > 1) {
+      setLocalQuantity((prev) => prev - 1);
+    }
+  };
+
+
+
+  //   const handleAddToCart = () => {
+  //   if(productId && singleProduct){
+  //     dispatch(addToCart(productId));
+  // };
+  // };
+  
+  // *OR
+
+  // const handleAddToCart = () => {
+  //   if(localStorage.getItem("token") == "" ||
+  //       localStorage.getItem("token") == null ||
+  //       localStorage.getItem("token") == undefined)
+  //   {
+  //     navigate("/login");
+  //   } 
+  //   else {
+  //     if (productId && singleProduct) {
+  //       dispatch(addToCart(productId));
+  //     }
+  //   }
+  // };
+
+  // *OR
+
+  // const handleAddToCart = () => {
+  //   if (!localStorage.getItem("token")) {
+  //     navigate("/login");
+  //   } else {
+  //     dispatch(addToCart(productId));
+  //   }
+  // };
+
+  // *OR
     const handleAddToCart = () => {
-    if(productId && singleProduct){
-      dispatch(addToCart(productId));
+    if (!localStorage.getItem("token")) {
+      navigate("/login");
+      return;
+    }
+
+    if (!singleProduct) return;
+
+    const existingItem = cartItems.find((i) => i.productId === productId);
+
+    if (existingItem) {
+      // Update existing item to new quantity
+      dispatch(updateCartItems({ ...existingItem, quantity: localQuantity }));
+    } else {
+      // Add new item with selected quantity
+      // Since addToCart adds 1 each time, call it localQuantity times
+      for (let i = 0; i < localQuantity; i++) {
+        dispatch(addToCart(productId));
+      }
+    }
   };
-  };
+
+
 
   // if (status === "loading") {
   //   return (
@@ -143,7 +247,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
             {/* Rating */}
             <div className="mb-6 flex gap-4 justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex">
+                <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
@@ -155,12 +259,15 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm font-medium text-gray-600">
-                  (5.0) • 1198 Ratings
-                </span>
+                  <p className="text-sm font-medium text-gray-600">
+                  (5.0) 
+                </p>
+                <p className="cursor-pointer text-sm font-medium leading-none text-gray-900 underline hover:underline">
+                    12 Reviews
+                  </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-md text-gray-800">Share via:</span>
+                <span className="text-md text-gray-800">Share:</span>
                 <button className="cursor-pointer text-blue-600 hover:text-blue-800">
                   <Facebook className="w-6 h-6" />
                 </button>
@@ -178,7 +285,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
             </div>
 
             {/* Quantity Selector */}
-            <div className="flex items-center gap-4 mb-8">
+            {/* <div className="flex items-center gap-4 mb-8">
               <button
                 onClick={() => handleQuantityChange("decrease")}
                 className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-800 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
@@ -196,7 +303,29 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
               >
                 <Plus className=" text-gray-800 h-4 w-4" />
               </button>
+            </div> */}
+
+
+             <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={handleDecrease}
+                disabled={localQuantity <= 1}
+                className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-800 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Minus className=" text-gray-800 h-4 w-4" />
+              </button>
+              <span className="w-12 text-center text-lg font-semibold">
+                {localQuantity}
+              </span>
+              <button
+                onClick={handleIncrease}
+                disabled={localQuantity >= singleProduct.productTotalStockQty}
+                className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-800 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                <Plus className=" text-gray-800 h-4 w-4" />
+              </button>
             </div>
+
 
             {/* Product Description */}
             <div className="prose max-w-none text-gray-700 leading-relaxed mb-6">

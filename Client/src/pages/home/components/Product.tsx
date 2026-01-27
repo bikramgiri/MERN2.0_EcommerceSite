@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
 import { fetchProducts } from "../../../store/productSlice";
 import {
@@ -11,11 +11,14 @@ import {
 } from "lucide-react";
 import { Status } from "../../../globals/statuses";
 import { AddToFavorite, removeFavorite } from "../../../store/userFavouriteSlice";
+import { addToCart } from "../../../store/cartSlice";
 
 const Product = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { product: products = [], status } = useAppSelector((state) => state.product);
   const { userFavorite: favorites } = useAppSelector((state) => state.favorite);
+  // const { items: cartItems = [] } = useAppSelector((state) => state.cart);
 
   const filterModalRef = useRef<HTMLDialogElement>(null);
 
@@ -26,6 +29,10 @@ const Product = () => {
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [ratingFilter, setRatingFilter] = useState(0);
   const [sortBy, setSortBy] = useState("newest");
+
+
+  // Local state for quantity
+  // const [localQuantity] = useState(1);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,7 +88,7 @@ const Product = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      setCurrentPage(1); // Reset to first page on filter/sort change
+      setCurrentPage(1); 
     }, 0);
   }, [
     selectedBrands,
@@ -188,6 +195,53 @@ const Product = () => {
                 }
               };
 
+                //  const handleAddToCart = () => {
+                //    if (
+                //      localStorage.getItem("token") == "" ||
+                //      localStorage.getItem("token") == null ||
+                //      localStorage.getItem("token") == undefined
+                //    ) {
+                //      navigate("/login");
+                //    } else {
+                //      if (product.id && product) {
+                //        dispatch(addToCart(product.id));
+                //      }
+                //    }
+                //  };
+
+                const handleAddToCart = () => {
+                  if (!localStorage.getItem("token")) {
+                    navigate("/login");
+                  } else {
+                    if (product.id && product) {
+                      dispatch(addToCart(product.id));
+                    }
+                  }
+                };
+
+                // // *Or
+                //     const handleAddToCart = () => {
+                //     if (!localStorage.getItem("token")) {
+                //       navigate("/login");
+                //       return;
+                //     }
+                
+                //     if (!product) return;
+                
+                //     const existingItem = cartItems.find((i) => i.productId === product.id);
+                
+                //     if (existingItem) {
+                //       // Update existing item to new quantity
+                //       dispatch(updateCartItems({ ...existingItem, quantity: localQuantity }));
+                //     } else {
+                //       // Add new item with selected quantity
+                //       // Since addToCart adds 1 each time, call it localQuantity times
+                //       for (let i = 0; i < localQuantity; i++) {
+                //         dispatch(addToCart(product.id));
+                //       }
+                //     }
+                //   };
+
               return (
                 <div
                   key={product.id}
@@ -245,8 +299,9 @@ const Product = () => {
                   <div className="p-5 border-t gap-4 border-gray-300 flex justify-between">
                     <button
                       type="button"
+                      onClick={handleAddToCart}
                       disabled={product.productTotalStockQty === 0}
-                      className="cursor-pointer gap-2 flex items-center justify-center rounded-xl px-9 py-3 text-base font-semibold text-white bg-indigo-700 hover:bg-indigo-800 transition-colors"
+                      className="cursor-pointer gap-2 flex items-center justify-center rounded-xl px-9 py-3 text-base font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed text-white bg-indigo-700 hover:bg-indigo-800 transition-colors"
                     >
                       <ShoppingCart className="w-6 h-6" />
                       Add

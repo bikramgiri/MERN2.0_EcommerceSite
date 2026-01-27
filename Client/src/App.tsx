@@ -11,6 +11,7 @@ import ForgotPassword from './pages/auth/ForgotPassword'
 import VerifyOTP from './pages/auth/VerifyOTP'
 import ChangePassword from './pages/auth/ChangePassword'
 import Favourites from './pages/favorites/UserFavorite'
+import Cart from './pages/cart/Cart'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       <Route path="/changepassword" element={<ChangePassword />} />
       <Route path="/productdetails/:id" element={<ProductDetails />} />
       <Route path="/favorites" element={<Favourites />} />
+      <Route path="/cart" element={<Cart />} />
     </Routes>
     <Footer />
     </BrowserRouter>

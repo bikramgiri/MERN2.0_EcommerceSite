@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { API } from "../http";
 import  {Status}  from "../globals/statuses";
-import type { AppDispatch } from './store';
+import type { AppDispatch, RootState } from './store';
 import type { Product, ProductState } from "../globals/types/productTypes";
 
 const initialState: ProductState = {
@@ -34,6 +34,7 @@ export function fetchProducts(){
         dispatch(setStatus(Status.LOADING));
         try {
             const response = await API.get("/admin/product");
+            console.log("Fetched products:", response.data.data);
             dispatch(setProducts(response.data.data.reverse()));
             dispatch(setStatus(Status.SUCCESS));
         } catch (error) {
@@ -45,48 +46,47 @@ export function fetchProducts(){
 
 
 // *Fetch Single product
-export function fetchSingleProduct(productId: string){
-      return async function fetchSingleProductThunk(dispatch: AppDispatch) {
-        dispatch(setStatus(Status.LOADING));
-        try {
-            const response = await API.get(`/admin/product/${productId}`);
-            dispatch(setSingleProduct(response.data.data));
-            dispatch(setStatus(Status.SUCCESS));
-        } catch (error) {
-            dispatch(setStatus(Status.ERROR));
-            throw error;
-        }
-    }
-}
+// export function fetchSingleProduct(productId: string){
+//       return async function fetchSingleProductThunk(dispatch: AppDispatch) {
+//         dispatch(setStatus(Status.LOADING));
+//         try {
+//             const response = await API.get(`/admin/product/${productId}`);
+//             dispatch(setSingleProduct(response.data.data));
+//             dispatch(setStatus(Status.SUCCESS));
+//         } catch (error) {
+//             dispatch(setStatus(Status.ERROR));
+//             throw error;
+//         }
+//     }
+// }
 
 // *OR
 
 // *Fetch Single product without API call
-// export function fetchSingleProduct(productId: string){
-//   return async function fetchSingleProductThunk(dispatch: AppDispatch, getState: () => RootState) {
-//     dispatch(setStatus(Status.LOADING));
-//       const state = getState();
-//       const products = state.product.product;
-//       const product = products.find(
-//         (product: Product) => product._id === productId,
-//       );
-//        console.log("Product found in state:", product)
-//       if (product) {
-//         dispatch(setSingleProduct(product));
-//         dispatch(setStatus(Status.SUCCESS));
-//       } else {
-//         try {
-//           const response = await API.get(`/admin/product/${productId}`);
-//           dispatch(setSingleProduct(response.data.data));
-//           dispatch(setStatus(Status.SUCCESS));
-//           console.log("Product fetched from API:", response.data.data)
-//         } catch (error) {
-//           dispatch(setStatus(Status.ERROR));
-//           throw error;
-//         }
-//       }
-//   }
-// }
+export function fetchSingleProduct(productId: string){
+  return async function fetchSingleProductThunk(dispatch: AppDispatch, getState: () => RootState) {
+      const state = getState();
+      const products = state.product.product;
+      const existProduct = products.find(
+        (product: Product) => product.id === productId,
+      );
+      if (existProduct) {
+        dispatch(setSingleProduct(existProduct));
+        dispatch(setStatus(Status.SUCCESS));
+      } else {
+        dispatch(setStatus(Status.LOADING));
+        try {
+          const response = await API.get(`/admin/product/${productId}`);
+          dispatch(setSingleProduct(response.data.data));
+          dispatch(setStatus(Status.SUCCESS));
+          console.log("Product fetched from API:", response.data.data)
+        } catch (error) {
+          dispatch(setStatus(Status.ERROR));
+          throw error;
+        }
+      }
+  }
+}
 
 
 
