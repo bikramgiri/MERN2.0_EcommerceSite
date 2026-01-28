@@ -12,6 +12,7 @@ import VerifyOTP from './pages/auth/VerifyOTP'
 import ChangePassword from './pages/auth/ChangePassword'
 import Favourites from './pages/favorites/UserFavorite'
 import Cart from './pages/cart/Cart'
+import CheckOut from './pages/checkout/CheckOut'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
       <Route path="/productdetails/:id" element={<ProductDetails />} />
       <Route path="/favorites" element={<Favourites />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<CheckOut />} />
     </Routes>
     <Footer />
     </BrowserRouter>

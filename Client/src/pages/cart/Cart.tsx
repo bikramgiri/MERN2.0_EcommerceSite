@@ -28,7 +28,7 @@ const Cart = () => {
     (sum, item) => sum + item.product.productPrice * item.quantity,
     0
   );
-  const shipping = 200;
+  const shipping = 70;
   const total = subtotal + shipping;
 
   if (status === Status.LOADING) {
@@ -62,20 +62,18 @@ const Cart = () => {
   return (
     <section className=" py-8 md:py-12 bg-gray-50 pb-16 mt-9 md:pt-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* <h1 className="text-4xl font-bold text-indigo-700 mb-10">
-          Your Cart
-          </h1> */}
-        <div className="mt-1 mb-1">
+
+        <div className="mt-2 mb-6 flex flex-col sm:flex-row items-center gap-1 sm:gap-6 md:gap-40 lg:gap-80">
           <button
             onClick={() => navigate("/")}
-            className="cursor-pointer group inline-flex items-center px-2 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-700 font-medium text-lg shadow-sm hover:shadow-md hover:border-indigo-400 hover:bg-indigo-50 transition-all duration-300"
+            className="cursor-pointer group inline-flex items-center justify-center px-2 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-700 font-medium text-base sm:text-lg hover:shadow-sm hover:border-indigo-400 hover:bg-indigo-50 transition-all duration-300 w-full sm:w-auto"
           >
-            <ArrowLeft className="w-5 h-5 text-indigo-700" />
-            <span>Back to Products</span>
+            <ArrowLeft className="w-5 h-5 mr-1 text-indigo-700" />
+            Back to Products
           </button>
-        </div>
-        <div className="flex items-center mb-6">
-          <h1 className="text-3xl font-bold text-indigo-800">Cart Products</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-indigo-800 text-center sm:text-left flex-1">
+            Cart Products
+          </h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -83,7 +81,7 @@ const Cart = () => {
             {cartItems.map((item) => (
               <div
                 key={item.productId} // Unique cart item key bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col sm:flex-row gap-6
-                className="bg-white rounded-2xl p-6 flex flex-col sm:flex-row gap-6
+                className="bg-white rounded-xl p-6 flex flex-col sm:flex-row gap-6
 
               shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
               dark:shadow-[0_-2px_34px_-14px_rgba(0,0,0,0.2),0_2px_14px_-8px_rgba(0,0,0,0.20)]
@@ -96,7 +94,7 @@ const Cart = () => {
               >
                 <Link
                   to={`/productdetails/${item.product.id}`}
-                  className="overflow-hidden flex-shrink-0 rounded-sm shadow-md"
+                  className="overflow-hidden flex-shrink-0 rounded-sm"
                 >
                   <img
                     src={item.product.productImage || "/placeholder.jpg"}
@@ -137,7 +135,7 @@ const Cart = () => {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between mt-6">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() =>
@@ -213,7 +211,15 @@ const Cart = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8 sticky top-24">
+            <div className="bg-white border border-gray-200 rounded-xl p-8 
+              shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
+              dark:shadow-[0_-2px_34px_-14px_rgba(0,0,0,0.2),0_2px_14px_-8px_rgba(0,0,0,0.20)]
+  
+              hover:shadow-[0_-6px_26px_-6px_rgba(0,0,0,0.6),0_8px_16px_-6px_rgba(0,0,0,0.1)]
+              dark:hover:shadow-[0_-8px_36px_-6px_rgba(0,0,0,0.12),0_6px_12px_-2px_rgba(0,0,0,0.14)]
+  
+              transition-shadow duration-500
+              ">
               <h2 className="text-2xl font-bold text-indigo-700 mb-6">
                 Order Summary
               </h2>
@@ -258,7 +264,7 @@ const Cart = () => {
                   <input
                     type="text"
                     placeholder="Enter code"
-                    className="flex-1 px-1 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700"
+                    className="flex-1 px-2 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700"
                   />
                   <button className="cursor-pointer px-4 py-3 bg-indigo-700 text-white font-medium rounded-xl hover:bg-indigo-800 transition shadow-md">
                     Apply
