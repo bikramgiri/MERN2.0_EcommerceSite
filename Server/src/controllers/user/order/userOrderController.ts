@@ -9,7 +9,7 @@ import Product from "../../../models/productModel";
 
 // *Extending Order Model to include paymentId
 class ExtendedOrder extends Order {
-     declare paymentId: string | null
+  declare paymentId: string | null
 }
 
 type OrderWithPayment = Order & {
@@ -28,8 +28,8 @@ class UserOrderController {
     const { phoneNumber, shippingAddress, totalAmount, paymentDetails, items }: OrderDetails = req.body;
     if ( !phoneNumber || !shippingAddress || !totalAmount || !paymentDetails || !paymentDetails.paymentMethod || !items || items.length === 0) {
       res.status(400).json({
-        message:
-          "All fields phoneNumber, shippingAddress, totalAmount, paymentDetails(paymentMethod) and items are required",
+        message: "All fields phoneNumber, shippingAddress, totalAmount, paymentDetails(paymentMethod) and items are required",
+        field: "general"
       });
       return;
     }
@@ -40,6 +40,7 @@ class UserOrderController {
     if (phone.length !== 10) {
       res.status(400).json({
         message: "Phone number must be exactly 10 digits long.",
+        field: "phoneNumber"
       });
       return;
     }
@@ -48,6 +49,7 @@ class UserOrderController {
     if (!/^\d{10}$/.test(phone)) {
       res.status(400).json({
         message: "Phone number must contain only digits (0-9).",
+        field: "phoneNumber"
       });
       return;
     }
@@ -57,6 +59,7 @@ class UserOrderController {
     if (existingPhoneNumber) {
       res.status(400).json({
         message: "Phone number already exists.",
+        field: "phoneNumber"
       });
       return;
     }
@@ -65,6 +68,7 @@ class UserOrderController {
     if (shippingAddress.length < 3) {
       res.status(400).json({
         message: "Shipping address must be at least 3 characters long.",
+        field: "shippingAddress"
       });
       return;
     }
@@ -73,6 +77,7 @@ class UserOrderController {
     if (totalAmount <= 0) {
       res.status(400).json({
         message: "Total amount must be a positive number.",
+        field: "totalAmount"
       });
       return;
     }
@@ -256,7 +261,9 @@ class UserOrderController {
   async updateOrder(req: AuthRequest, res: Response): Promise<void> {
   const userId = req.user?.id;
   if (!userId) {
-    res.status(401).json({ message: "User not authenticated" });
+    res.status(401).json({ 
+      message: "User not authenticated"
+     });
     return;
   }
 
@@ -279,7 +286,8 @@ class UserOrderController {
   if (!phoneNumber || !shippingAddress || !totalAmount || 
       !paymentDetails?.paymentMethod || !items?.length) {
     res.status(400).json({
-      message: "Required fields: phoneNumber, shippingAddress, totalAmount, paymentDetails.paymentMethod, items (non-empty)"
+      message: "Phone Number, Shipping Address, Total Amount, Payment Method and Items are required.",
+      field: "general"
     });
     return;
   }
@@ -288,22 +296,34 @@ class UserOrderController {
 
   // Phone number validation
   if (phone.length !== 10) {
-    res.status(400).json({ message: "Phone number must be exactly 10 digits long." });
+    res.status(400).json({ 
+      message: "Phone number must be exactly 10 digits long.",
+      field: "phoneNumber"
+    });
     return;
   }
 
   if (!/^\d{10}$/.test(phone)) {
-    res.status(400).json({ message: "Phone number must contain only digits (0-9)." });
+    res.status(400).json({ 
+      message: "Phone number must contain only digits (0-9).",
+      field: "phoneNumber"
+    });
     return;
   }
 
   if (shippingAddress.length < 3) {
-    res.status(400).json({ message: "Shipping address must be at least 3 characters long." });
+    res.status(400).json({ 
+      message: "Shipping address must be at least 3 characters long.",
+      field: "shippingAddress"
+    });
     return;
   }
 
   if (totalAmount <= 0) {
-    res.status(400).json({ message: "Total amount must be a positive number." });
+    res.status(400).json({ 
+      message: "Total amount must be a positive number." ,
+      field: "totalAmount"
+    });
     return;
   }
 
@@ -435,6 +455,7 @@ class UserOrderController {
     if (!userId) {
       res.status(401).json({
         message: "User not authenticated",
+        field: "user"
       });
       return;
     }
