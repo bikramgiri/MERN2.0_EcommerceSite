@@ -17,7 +17,6 @@ class AuthController {
       return;
     }
 
-    // valiadte user length must be greater than 3
     if (username.length < 3) {
       res.status(400).json({
         message: "Username must be at least 3 characters long",
@@ -26,7 +25,6 @@ class AuthController {
       return;
     }
 
-    // valiadte email format like ram12gmail.com, ram@gmail.com
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       res.status(400).json({
@@ -36,7 +34,6 @@ class AuthController {
       return;
     }
 
-    // validate if email already exists
     const existingEmail = await User.findOne({ where: { email } });
     if (existingEmail) {
       res.status(409).json({
@@ -46,8 +43,7 @@ class AuthController {
       return;
     }
 
-    // validate password length must be at least 8 characters
-    if (password.length < 8) {
+   if (password.length < 8) {
       res.status(400).json({
         message: "Password must be at least 8 characters long",
         field: "password",
@@ -84,7 +80,6 @@ class AuthController {
     }
 
     try {
-      // Check if user exists
       const userExist = await User.findOne({ where: { email } });
       if (!userExist) {
         res.status(404).json({
@@ -94,7 +89,6 @@ class AuthController {
         return;
       }
 
-      // Validate password
       const passwordIsValid = bcrypt.compareSync(password, userExist.password);
       if (!passwordIsValid) {
         res.status(401).json({
@@ -104,22 +98,20 @@ class AuthController {
         return;
       }
 
-      // Generate JWT token
       const token = jwt.sign(
         { id: userExist.id },
         process.env.JWT_SECRET_KEY as string,
         
         {
-          expiresIn: "1d", // Token valid for 1 day
+          expiresIn: "1d",
         },
       );
 
-      // Set token as a cookie
       res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+        secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        maxAge: 24 * 60 * 60 * 1000, 
       });
 
       res.status(200).json({
@@ -175,7 +167,6 @@ class AuthController {
     // const userEmails = allUsers.map((user) => user.email);
     // console.log("User Emails:", userEmails);
 
-    // Check if user exists
     const userExist = await User.findOne({ where: { email } });
     if (!userExist) {
       res.status(404).json({
@@ -185,10 +176,8 @@ class AuthController {
       return;
     }
 
-    // Generate OTP
     const generateotp = Math.floor(100000 + Math.random() * 900000).toString(); 
 
-    // Save OTP and OTP expiry to user record
     userExist.otp = generateotp;
     userExist.otpGeneratedTime = new Date(Date.now());
     await userExist.save();
@@ -234,7 +223,6 @@ class AuthController {
     return;
   }
 
-    // Check if user exists
     const userExist = await User.findOne({ where: { email } });
     if (!userExist) {
       res.status(404).json({
@@ -244,7 +232,6 @@ class AuthController {
       return;
     }
 
-    // check otp must 6 digits
     if (otp.length !== 6) {
       res.status(400).json({
         message: "OTP must be 6 digits",
@@ -253,7 +240,6 @@ class AuthController {
       return;
     }
 
-    // Check if OTP is valid
     if (userExist.otp !== otp) {
       res.status(400).json({
         message: "Invalid OTP",
@@ -262,23 +248,21 @@ class AuthController {
       return;
     }
 
-      // Check if OTP is expired
   const currentTime = Date.now();
   const otpGeneratedTime = userExist.otpGeneratedTime;
   const timeDifference = currentTime - otpGeneratedTime.getTime();
-  const otpExpiryTime = 59 * 60 * 1000; // 3 minutes in milliseconds
+  const otpExpiryTime = 59 * 60 * 1000; 
   if (timeDifference > otpExpiryTime) {
-    // Check if OTP has expired
     res.status(400).json({
       message: "OTP has expired",
+      field: "otp",
     });
     return;
   }
 
-  // save the OTP
-  userExist.otp = otp; // Save OTP to user document
-  userExist.otpGeneratedTime = new Date(Date.now()); // Save OTP generated time
-  await userExist.save(); // Save the updated user document
+  userExist.otp = otp; 
+  userExist.otpGeneratedTime = new Date(Date.now()); 
+  await userExist.save(); 
 
     res.status(200).json({
       message: "OTP verified successfully",
@@ -303,11 +287,11 @@ class AuthController {
   if (!emailRegex.test(email)) {
    res.status(400).json({
       message: "Invalid email format",
+      field: "email",
     });
     return;
   }
 
-    // Check if user exists
     const userExist = await User.findOne({ where: { email } });
     if (!userExist) {
       res.status(404).json({
@@ -317,7 +301,6 @@ class AuthController {
       return;
     }
 
-    // check otp must 6 digits
     if (otp.length !== 6) {
       res.status(400).json({
         message: "OTP must be 6 digits",
@@ -326,7 +309,6 @@ class AuthController {
       return;
     }
 
-    // Check if OTP is valid
     if (userExist.otp !== otp) {
       res.status(400).json({
         message: "Invalid OTP",
@@ -335,45 +317,48 @@ class AuthController {
       return;
     }
 
-      // Check if OTP is expired
   const currentTime = Date.now();
   const otpGeneratedTime = userExist.otpGeneratedTime;
   const timeDifference = currentTime - otpGeneratedTime.getTime();
   const otpExpiryTime = 59 * 60 * 1000; // 2 minutes in milliseconds
   if (timeDifference > otpExpiryTime) {
-    // Check if OTP has expired
     res.status(400).json({
       message: "OTP has expired",
+      field: "otp",
     });
     return;
   }
 
-  // save the OTP
-  userExist.otp = otp; // Save OTP to user document
-  userExist.otpGeneratedTime = new Date(Date.now()); // Save OTP generated time
-  await userExist.save(); // Save the updated user document
+  userExist.otp = otp; 
+  userExist.otpGeneratedTime = new Date(Date.now()); 
+  await userExist.save(); 
 
   // Validate new password strength
   if (newPassword.length < 8) {
     res.status(400).json({
       message: "New password must be at least 8 characters long",
+      field: "newPassword",
     });
     return;
   }
 
-  // Check if new password and confirm password match
   if (newPassword !== confirmPassword) {
     res.status(400).json({
       message: "New password and confirm password do not match",
+      field: "confirmPassword",
     });
     return;
   }
 
-  // Update the user's password
-  userExist.password = bcrypt.hashSync(newPassword, 10); // Hash the new password
-  await userExist.save(); // Save the updated user document
+  userExist.password = bcrypt.hashSync(newPassword, 8); 
+  await userExist.save(); 
 
-  }
+  res.status(200).json({
+    message: "Password changed successfully",
+  });
+
+}  
+  
 }
 
 export default AuthController;

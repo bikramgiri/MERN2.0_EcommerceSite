@@ -6,6 +6,7 @@ import Payment from "../../../models/paymentModel";
 import OrderDetail from "../../../models/orderDetailsModel";
 import axios from "axios";
 import Product from "../../../models/productModel";
+import Cart from "../../../models/cartModel";
 
 // *Extending Order Model to include paymentId
 class ExtendedOrder extends Order {
@@ -93,7 +94,9 @@ class UserOrderController {
         phoneNumber: phone,
         shippingAddress,
         totalAmount,
+        items: items,
         paymentId: paymentData.id,
+        paymentDetails
       });
 
       // for(var i = 0; i<items.length; i++){ // in for loop: (var i=0; i<items.length; i++), for each: const item of items
@@ -104,13 +107,23 @@ class UserOrderController {
       //       })
       // }
       // *Or
+      let responseOrderData;
       for (const item of items) { // It automatically iterates over each item in the items array
-        await OrderDetail.create({
+        responseOrderData = await OrderDetail.create({
           quantity: item.quantity,
           productId: item.productId,
           orderId: newOrder.id,
         });
       }
+     
+      // Clear user's cart after order placement
+      await Cart.destroy({ 
+        where: { 
+          userId: userId,
+          productId: items.map(item => item.productId) 
+        } 
+      });
+
       if (paymentDetails.paymentMethod === PaymentMethod.Khalti) {
         const data = {
           return_url: "http://localhost:4000/khalti-payment-success",
@@ -134,14 +147,16 @@ class UserOrderController {
         
         res.status(201).json({
               message: "Order placed successfully",
-                  order: newOrder,
-                  url: khaltiResponse.payment_url
+              order: newOrder,
+              url: khaltiResponse.payment_url,
+              data: responseOrderData
         });
         return;
       }
       res.status(201).json({
         message: "Order created successfully",
         order: newOrder,
+        data: responseOrderData
       });
     } catch (err) {
       res.status(500).json({
