@@ -18,7 +18,7 @@ const cartSlice = createSlice({
           setItems(state: CartState, action: PayloadAction<CartItem[]>) {
                   state.items = action.payload;
           },
-          setStatus(state: CartState, action: PayloadAction<string>) {
+          setStatus(state: CartState, action: PayloadAction<Status>) {
                   state.status = action.payload;
           },
           deleteItem(state: CartState, action: PayloadAction<string>) {
@@ -80,7 +80,6 @@ export function fetchCartItems(){
             dispatch(setStatus(Status.LOADING));
             try{
                   const response = await APIAuthenticated.get(`user/cart`);
-                  console.log("Cart items response:", response);
                   if(response.status === 200){
                         const transformedItems = transformCartItems(response.data.data || []);
                         dispatch(setItems(transformedItems));

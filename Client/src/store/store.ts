@@ -3,6 +3,7 @@ import authSlice from "./authSlice";
 import productSlice from "./productSlice";
 import userFavoriteSlice from "./userFavouriteSlice";
 import cartSlice from "./cartSlice";
+import checkoutSlice from "./checkoutSlice";
 
 const store = configureStore({
       reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
             product: productSlice,
             favorite: userFavoriteSlice,
             cart: cartSlice,
+            checkout: checkoutSlice,
       },
 });
 

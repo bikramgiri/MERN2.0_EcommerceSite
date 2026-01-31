@@ -48,7 +48,7 @@ const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") 
 const initialState: AuthState = {
   user : storedUser ? JSON.parse(storedUser) : {} as User,
   status: Status.IDLE,
-      token: "",
+  token: "",
   // token: localStorage.getItem("token") || "", // Load on init
   email: ""
 };
@@ -60,7 +60,7 @@ const authSlice = createSlice({
       setUser(state:AuthState, action:PayloadAction<User>){
         state.user = action.payload; 
       },
-      setStatus(state:AuthState, action:PayloadAction<string>){
+      setStatus(state:AuthState, action:PayloadAction<Status>){
         state.status = action.payload;
       },
       setToken: (state: AuthState, action: PayloadAction<string>) => {
@@ -118,7 +118,8 @@ export function loginUser(data: loginData) {
   return async function loginUserThunk(dispatch: AppDispatch) {
     dispatch(setStatus(Status.LOADING));
     try {
-      const response = await API.post("/auth/login", data);      if (response.status === 200) {
+      const response = await API.post("/auth/login", data);      
+      if (response.status === 200) {
          dispatch(setUser(response.data.data));
          localStorage.setItem("user", JSON.stringify(response.data.data));
          dispatch(setToken(response.data.token));

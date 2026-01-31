@@ -19,7 +19,6 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
 
   const { userFavorite: favorites } = useAppSelector((state) => state.favorite);
     const { items: cartItems = [] } = useAppSelector((state) => state.cart);
-    console.log("Cart Items in Single Product:", cartItems);
 
   useEffect(() => {
     if (productId && productId !== "undefined") {
@@ -166,15 +165,6 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
       </div>
     );
   }
-
-  if (!singleProduct) {
-    return (
-      <div className="text-center py-20 text-xl text-red-600 min-h-[70vh] flex items-center justify-center">
-        Product not found
-      </div>
-    );
-  }
-
 
   if (!singleProduct) {
     return (

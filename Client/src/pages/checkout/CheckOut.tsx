@@ -1,32 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { removeFromCart, updateCartItems } from "../../store/cartSlice";
 import { ArrowLeft, Minus, Plus, Trash } from "lucide-react";
+import { PaymentMethod, type ItemsDetails, type OrderData } from "../../globals/types/checkoutTypes";
+import { createOrder } from "../../store/checkoutSlice";
+import { Status } from "../../globals/statuses";
 
 const CheckOut = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { items: cartItems = [] } = useAppSelector((state => state.cart));
+  const {khaltiUrl, status} = useAppSelector((state) => state.checkout);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
+  const [message, setMessage] = useState<string>("");
 
-  const [billing, setBilling] = useState({
-    name: "",
+  const [data, setData] = useState<OrderData>({
+    phoneNumber: "",
+    totalAmount: 0,
+    paymentDetails: {
+      paymentMethod: PaymentMethod.COD,
+    },
+    shippingAddress: "",
+    items: [],
+    username: "",
     email: "",
-    phone: "",
-    address: "",
     city: "",
     state: "",
-    postalCode: "",
+    postalCode: 0,
     country: "Nepal",
     saveData: false,
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 
-  const handleBillingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = type === "checkbox" ? (e.target as HTMLInputElement).checked : undefined;
-    setBilling((prev) => ({
+    setData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
@@ -54,8 +64,8 @@ const CheckOut = () => {
 
   const paymentMethods = [
     {
-      id: "cash-on-delivery",
-      name: "Cash on Delivery",
+      id: "cod",
+      name: "COD",
       icon: (
         <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -82,6 +92,58 @@ const CheckOut = () => {
       ),
     },
   ];
+
+const handlePaymentMethod = (e: ChangeEvent<HTMLInputElement>) => {
+    const method = e.target.value as PaymentMethod;
+    setPaymentMethod(method);
+    setData((prev) => ({
+      ...prev,
+      paymentDetails: {
+        paymentMethod: method,
+      },
+    }));
+  };
+
+  const handlePlaceOrder = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const itemsDetails:ItemsDetails[] = cartItems.map((item) => {
+        return {
+          productId: item.productId,
+          quantity: item.quantity
+        }
+      });
+      const orderData: OrderData = {
+        ...data,
+        items: itemsDetails,
+        totalAmount: total,
+        paymentDetails: {
+          paymentMethod: paymentMethod
+        }
+      };
+      await dispatch(createOrder(orderData))
+  }
+
+  useEffect(() => {
+    if (status === Status.SUCCESS) {
+      if (paymentMethod !== PaymentMethod.Khalti) {
+        setTimeout(() => {
+          setMessage("Order placed successfully!");
+          navigate("/");
+        }, 4000);
+      }
+    } else if (status === Status.ERROR) {
+      setTimeout(() => {
+        setMessage("Failed to place the order");
+      }, 3000);
+    }
+  }, [status, paymentMethod, navigate]);
+
+  useEffect(() => {
+    if (paymentMethod === PaymentMethod.Khalti && khaltiUrl) {
+      window.location.href = khaltiUrl;
+    }
+  }, [khaltiUrl, paymentMethod]);
+
 
   if (cartItems.length === 0) {
     return (
@@ -115,8 +177,9 @@ const CheckOut = () => {
             Checkout
           </h1>
         </div>
-
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* <form onSubmit={handleSubmit}> */}
           <div className="space-y-8">
             <div
               className="bg-white rounded-xl p-6 md:p-8
@@ -141,10 +204,9 @@ const CheckOut = () => {
                     </label>
                     <input
                       type="text"
-                      name="name"
-                      required
-                      value={billing.name}
-                      onChange={handleBillingChange}
+                      name="username"
+                      value={data.username}
+                      onChange={handleDataChange}
                       placeholder="Enter your name"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     />
@@ -156,9 +218,8 @@ const CheckOut = () => {
                     <input
                       type="email"
                       name="email"
-                      required
-                      value={billing.email}
-                      onChange={handleBillingChange}
+                      value={data.email}
+                      onChange={handleDataChange}
                       placeholder="Enter your email"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     />
@@ -211,10 +272,10 @@ const CheckOut = () => {
                     </label>
                     <input
                       type="text"
-                      name="phone"
+                      name="phoneNumber"
                       required
-                      value={billing.phone}
-                      onChange={handleBillingChange}
+                      value={data.phoneNumber}
+                      onChange={handleDataChange}
                       placeholder="Enter your phone number"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     />
@@ -225,10 +286,10 @@ const CheckOut = () => {
                     </label>
                     <input
                       type="text"
-                      name="address"
+                      name="shippingAddress"
                       required
-                      value={billing.address}
-                      onChange={handleBillingChange}
+                      value={data.shippingAddress}
+                      onChange={handleDataChange}
                       placeholder="Enter your shipping address"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     />
@@ -243,9 +304,8 @@ const CheckOut = () => {
                     <input
                       type="text"
                       name="city"
-                      required
-                      value={billing.city}
-                      onChange={handleBillingChange}
+                      value={data.city}
+                      onChange={handleDataChange}
                       placeholder="Enter your city"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     />
@@ -257,8 +317,8 @@ const CheckOut = () => {
                     <input
                       type="text"
                       name="state"
-                      value={billing.state}
-                      onChange={handleBillingChange}
+                      value={data.state}
+                      onChange={handleDataChange}
                       placeholder="Enter your state/province"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     />
@@ -272,8 +332,8 @@ const CheckOut = () => {
                     </label>
                     <select
                       name="country"
-                      value={billing.country}
-                      onChange={handleBillingChange}
+                      value={data.country}
+                      onChange={handleDataChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     >
                       <option value="">Select your country</option>
@@ -291,8 +351,8 @@ const CheckOut = () => {
                     <input
                       type="text"
                       name="postalCode"
-                      value={billing.postalCode}
-                      onChange={handleBillingChange}
+                      value={data.postalCode}
+                      onChange={handleDataChange}
                       placeholder="Enter your postal code"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-700 transition"
                     />
@@ -303,8 +363,8 @@ const CheckOut = () => {
                   <input
                     type="checkbox"
                     name="saveData"
-                    checked={billing.saveData}
-                    onChange={handleBillingChange}
+                    checked={data.saveData}
+                    onChange={handleDataChange}
                     required
                     className="cursor-pointer w-5 h-5 text-indigo-700 rounded focus:ring-indigo-500"
                   />
@@ -346,8 +406,8 @@ const CheckOut = () => {
                       type="radio"
                       name="paymentMethod"
                       value={method.name}
+                      onChange={handlePaymentMethod}
                       checked={paymentMethod === method.name}
-                      onChange={() => setPaymentMethod(method.name)}
                       className="w-5 h-5 text-indigo-600 focus:ring-indigo-500"
                     />
                     <div className="ml-4 flex items-center justify-between w-full">
@@ -368,6 +428,7 @@ const CheckOut = () => {
               </div>
             </div>
           </div>
+          {/* </form> */}
 
           {/* Right Column: Cart Items Review + Order Summary (matches Cart style) */}
           <div className="space-y-8">
@@ -525,18 +586,31 @@ const CheckOut = () => {
               </div>
 
               {/* Place Order Button - Color based on payment method */}
-              {paymentMethod === "Cash on Delivery" ? (
-                <button className="w-full mt-8 py-4 bg-yellow-600 text-white text-lg font-semibold rounded-xl hover:bg-yellow-700 transition shadow-md">
+              {paymentMethod === "COD" ? (
+                <button type="button" 
+                onClick={handlePlaceOrder}
+                className="cursor-pointer w-full mt-8 py-4 bg-yellow-600 text-white text-lg font-semibold rounded-xl hover:bg-yellow-700 transition shadow-md">
                   Place Order
                 </button>
               ) : paymentMethod === "Khalti" ? (
-                <button className="w-full mt-8 py-4 bg-purple-600 text-white text-lg font-semibold rounded-xl hover:bg-purple-700 transition shadow-md">
+                <button type="button"
+                onClick={handlePlaceOrder} 
+                className="cursor-pointer w-full mt-8 py-4 bg-purple-600 text-white text-lg font-semibold rounded-xl hover:bg-purple-700 transition shadow-md">
                   Pay with Khalti
                 </button>
               ) : (
-                <button className="w-full mt-8 py-4 bg-green-600 text-white text-lg font-semibold rounded-xl hover:bg-green-700 transition shadow-md">
+                <button type="button" 
+                onClick={handlePlaceOrder}
+                className="cursor-pointer w-full mt-8 py-4 bg-green-600 text-white text-lg font-semibold rounded-xl hover:bg-green-700 transition shadow-md">
                   Pay with eSewa
                 </button>
+              )}
+              {message && (
+                <div className={`mt-4 p-4 rounded-lg text-center font-medium ${
+                  status === Status.SUCCESS ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                }`}>
+                  {message}
+                </div>
               )}
             </div>
           </div>
