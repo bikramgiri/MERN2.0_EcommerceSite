@@ -34,7 +34,6 @@ export function fetchProducts(){
         dispatch(setStatus(Status.LOADING));
         try {
             const response = await API.get("/admin/product");
-            console.log("Fetched products:", response.data.data);
             dispatch(setProducts(response.data.data.reverse()));
             dispatch(setStatus(Status.SUCCESS));
         } catch (error) {

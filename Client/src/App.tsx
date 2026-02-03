@@ -13,6 +13,8 @@ import ChangePassword from './pages/auth/ChangePassword'
 import Favourites from './pages/favorites/UserFavorite'
 import Cart from './pages/cart/Cart'
 import CheckOut from './pages/checkout/CheckOut'
+import MyOrders from './pages/orders/MyOrders'
+import MyOrdersDetails from './pages/orders/MyOrdersDetails'
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
       <Route path="/favorites" element={<Favourites />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<CheckOut />} />
+      <Route path="/myorders" element={<MyOrders />} />
+      <Route path="/myorders/orderdetails/:id" element={<MyOrdersDetails />} />
     </Routes>
     <Footer />
     </BrowserRouter>

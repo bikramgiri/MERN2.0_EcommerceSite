@@ -106,6 +106,7 @@ const handlePaymentMethod = (e: ChangeEvent<HTMLInputElement>) => {
 
   const handlePlaceOrder = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    setMessage(""); 
     const itemsDetails:ItemsDetails[] = cartItems.map((item) => {
         return {
           productId: item.productId,
@@ -113,14 +114,15 @@ const handlePaymentMethod = (e: ChangeEvent<HTMLInputElement>) => {
         }
       });
       const orderData: OrderData = {
-        ...data,
-        items: itemsDetails,
-        totalAmount: total,
-        paymentDetails: {
-          paymentMethod: paymentMethod
-        }
-      };
-      await dispatch(createOrder(orderData))
+      phoneNumber: data.phoneNumber,
+      shippingAddress: data.shippingAddress,
+      totalAmount: total,
+      paymentDetails: {
+        paymentMethod: paymentMethod,
+      },
+      items: itemsDetails,
+    };
+    await dispatch(createOrder(orderData))
   }
 
   useEffect(() => {
@@ -129,18 +131,24 @@ const handlePaymentMethod = (e: ChangeEvent<HTMLInputElement>) => {
         setTimeout(() => {
           setMessage("Order placed successfully!");
           navigate("/");
-        }, 4000);
+          setMessage("");
+        }, 2000);
       }
     } else if (status === Status.ERROR) {
       setTimeout(() => {
         setMessage("Failed to place the order");
-      }, 3000);
+        setTimeout(() => {
+          setMessage("");
+        }, 3000);
+      }, 0);
     }
-  }, [status, paymentMethod, navigate]);
+  }, [paymentMethod, navigate]);
 
   useEffect(() => {
     if (paymentMethod === PaymentMethod.Khalti && khaltiUrl) {
-      window.location.href = khaltiUrl;
+      setTimeout(() => {
+        window.location.href = khaltiUrl;
+      }, 1000);
     }
   }, [khaltiUrl, paymentMethod]);
 
