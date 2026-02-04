@@ -1,15 +1,16 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { Status } from "../globals/statuses";
-import type { CheckoutState, OrderData, FetchOrder } from "../globals/types/checkoutTypes";
+import type { CheckoutState, OrderData, FetchOrder, SingleOrder } from "../globals/types/checkoutTypes";
 import { APIAuthenticated } from "../http";
 import type { AppDispatch } from "./store";
 import { emptyCart } from "./cartSlice";
 
 const initialState: CheckoutState = {
       items: [],
-      status: Status.IDLE,
+      status: Status.LOADING,
       khaltiUrl: null,
       myOrder: [],
+      singleOrder: []
 }
 
 const checkoutSlice = createSlice({
@@ -21,6 +22,9 @@ const checkoutSlice = createSlice({
             },
             setMyOrders(state: CheckoutState, action: PayloadAction<FetchOrder[]>) {
                   state.myOrder = action.payload;
+            },
+            setSingleOrder(state: CheckoutState, action: PayloadAction<SingleOrder[]>) {
+                  state.singleOrder = action.payload;
             },
             setStatus(state: CheckoutState, action: PayloadAction<Status>) {
                   state.status = action.payload;
@@ -35,7 +39,7 @@ const checkoutSlice = createSlice({
 
 })
 
-export const { setItems, setMyOrders, setStatus, setKhaltiUrl, deleteOrder } = checkoutSlice.actions; 
+export const { setItems, setMyOrders, setSingleOrder, setStatus, setKhaltiUrl, deleteOrder } = checkoutSlice.actions; 
 export default checkoutSlice.reducer;
 
 export function createOrder(data: OrderData) {
@@ -64,14 +68,60 @@ export function fetchMyOrder() {
     dispatch(setStatus(Status.LOADING));
     try {
       const response = await APIAuthenticated.get("/user/order");
-      dispatch(setMyOrders(response.data.data))
-      dispatch(setStatus(Status.SUCCESS));
+      if(response.status === 200){
+            dispatch(setMyOrders(response.data.data))
+            dispatch(setStatus(Status.SUCCESS));
+      }
     } catch (error) {
       dispatch(setStatus(Status.ERROR));
       throw error;
     }
   };
 }
+
+export function fetchMySingleOrder(id: string) {
+  return async function fetchOrderThunk(dispatch: AppDispatch) {
+    dispatch(setStatus(Status.LOADING));
+    try {
+      const response = await APIAuthenticated.get(`/user/order/${id}`);
+      if(response.status === 200){
+            dispatch(setSingleOrder(response.data.data))
+            dispatch(setStatus(Status.SUCCESS));
+      }
+    } catch (error) {
+      dispatch(setStatus(Status.ERROR));
+      throw error;
+    }
+  };
+}
+
+// *Or
+// *Fetch Single order without API call
+// export function fetchMySingleOrder(id: string){
+//   return async function fetchMySingleOrderThunk(dispatch: AppDispatch, getState: () => {checkout: CheckoutState}) { 
+//       const state = getState();
+//       const orders = state.checkout.myOrder;
+//       const existOrder = orders.find(
+//         (order: FetchOrder) => order.id === id,
+//       );
+//       if (existOrder) {
+//         dispatch(setSingleOrder([existOrder]));
+//         dispatch(setStatus(Status.SUCCESS));
+//       } else {
+//         dispatch(setStatus(Status.LOADING));
+//         try {
+//           const response = await APIAuthenticated.get(`/user/order/${id}`);
+//           if(response.status === 200){
+//                 dispatch(setSingleOrder(response.data.data))
+//                 dispatch(setStatus(Status.SUCCESS));
+//           }
+//         } catch (error) {
+//           dispatch(setStatus(Status.ERROR));
+//           throw error;
+//         }
+//       }
+//   }
+// }
 
 export function deleteMyOrders(id: string){
   return async function deleteMyOrdersThunk(dispatch: AppDispatch){

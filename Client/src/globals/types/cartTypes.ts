@@ -1,4 +1,3 @@
-// import type { Product } from "./productTypes";
 
 export interface CartProduct {
   id: string;

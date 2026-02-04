@@ -1,4 +1,4 @@
-import type { Product, User } from "./productTypes"
+import type { Product, UserData } from "./productTypes"
 
 export interface AddToFavoriteData{
       id: string
@@ -12,7 +12,7 @@ export interface UserFavorite{
       updatedAt?: string,
       userId: string,
       productId: string
-      User?: User,
+      User?: UserData,
       Product: Product
 }
 

@@ -1,9 +1,8 @@
 
-export interface User{
+export interface UserData{
       id: string,
       username: string,
-      email: string,
-      password: string
+      email: string
 }
 
 export interface Category{
@@ -27,7 +26,7 @@ export interface Product{
       updatedAt: string,
       userId: string,
       categoryId: string
-      User: User,
+      User: UserData,
       Category: Category,
       Ratings?: number
 }

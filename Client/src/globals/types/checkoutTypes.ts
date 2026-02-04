@@ -1,3 +1,4 @@
+import type { Product, UserData } from "./productTypes";
 
 export enum PaymentMethod{
       COD = "COD",
@@ -30,6 +31,7 @@ export interface ItemsDetails{
       productId: string;
       quantity: number;
 }
+
 export interface FetchOrder extends ItemsDetails{
   id: string;
   phoneNumber: string;
@@ -39,7 +41,7 @@ export interface FetchOrder extends ItemsDetails{
   createdAt: string;
   updatedAt: string;
   paymentId: string;
-  userId: string;
+  userId: UserData;
   OrderDetails: Array<{
     id: string;
     quantity: number;
@@ -49,6 +51,11 @@ export interface FetchOrder extends ItemsDetails{
     paymentMethod: PaymentMethod;
     paymentStatus: PaymentStatus;
   };
+  // optional fields for single order view
+  orderId: string;
+  Product: Product;
+  Order: FetchOrder;
+  User: UserData;
 }
 
 export interface OrderData {
@@ -68,9 +75,18 @@ export interface OrderData {
   saveData?: false;
 }
 
+export interface SingleOrder{
+      id: string;
+      quantity: number;
+      orderId: string;
+      Product: Product;
+      Order: FetchOrder;
+} 
+
 export interface CheckoutState{
       items: OrderData[];
       status: string;
       khaltiUrl: string | null;
-      myOrder: FetchOrder[]
+      myOrder: FetchOrder[];
+      singleOrder: SingleOrder[];
 }

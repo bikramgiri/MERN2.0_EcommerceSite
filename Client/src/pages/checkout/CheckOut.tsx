@@ -436,7 +436,6 @@ const handlePaymentMethod = (e: ChangeEvent<HTMLInputElement>) => {
               </div>
             </div>
           </div>
-          {/* </form> */}
 
           {/* Right Column: Cart Items Review + Order Summary (matches Cart style) */}
           <div className="space-y-8">

@@ -1,280 +1,319 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { APIAuthenticated } from "../../http";
-import QRCode from "react-qr-code";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { fetchMyOrder } from "../../store/checkoutSlice";
+import { fetchMySingleOrder } from "../../store/checkoutSlice";
+import { Status } from "../../globals/statuses";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import QRCode from "react-qr-code";
+import { APIAuthenticated } from "../../http";
 
 const MyOrdersDetails = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { id } = useParams();
-  const { myOrder, } = useAppSelector((state) => state.checkout);
-  console.log("Orders from Store:", myOrder);
+  const { id } = useParams<{ id: string }>();
+  const { singleOrder, status } = useAppSelector((state) => state.checkout);
 
   useEffect(() => {
-    dispatch(fetchMyOrder()); // Ensure orders are fetched if not already in store
-  }, [dispatch]);
-
-  // Filter orders to find the one with matching ID
-  const filteredOrder = myOrder.find((order) => order.id === id);
-
-    const totalProductAmount = filteredOrder?.items.reduce((total, item) => {
-      return total + (item.product?.productPrice || 0) * item.quantity;
-    }, 0) || 0;
-
-    const handleCancelOrder = async()=>{
-      try {
-        const response = await APIAuthenticated.patch(`/users/orders/cancel/${id}`);
-        console.log("Cancel Response:", response)
-        if(response.status === 200) {
-        navigate("/myorders")
-        }
-      } catch (error) {
-        console.error("Error cancelling order:", error);
-      }
+    if (id) {
+      dispatch(fetchMySingleOrder(id));
     }
+  }, [dispatch, id]);
 
-    const handleDeleteOrder = async()=>{
-      try {
-        const response = await APIAuthenticated.delete(`/users/orders/${id}`);
-        console.log("Delete Response:", response)
-        if(response.status === 200) {
-        navigate("/myorders")
-        }
-      } catch (error) {
-        console.error("Error deleting order:", error);
+  const orderInfo = singleOrder?.[0]?.Order;
+  const items = singleOrder || [];
+
+  const totalProductAmount = items.reduce((sum, item) => {
+    return sum + (item.Product?.productPrice || 0) * item.quantity;
+  }, 0);
+
+  const shipping = 200;
+  const grandTotal = totalProductAmount + shipping;
+
+  const adminOrderPageUrl = `http://localhost:5174/admin/orders/${id}`;
+
+  const handleCancelOrder = async () => {
+    try {
+      const response = await APIAuthenticated.patch(`/users/orders/cancel/${id}`);
+      if (response.status === 200) {
+        navigate("/myorders");
       }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
     }
+  };
 
-    const adminOrderPageUrl = `http://localhost:5174/admin/orders/${id}`;
+  const handleDeleteOrder = async () => {
+    try {
+      const response = await APIAuthenticated.delete(`/users/orders/${id}`);
+      if (response.status === 200) {
+        navigate("/myorders");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
+  };
+
+  // Loading State
+  if (status !== Status.SUCCESS) {
+    return (
+      <section className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-16 h-16 animate-spin text-indigo-600 mx-auto mb-4" />
+          <p className="text-xl text-gray-700">Loading order details...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Not Found / Empty
+  if (!singleOrder || singleOrder.length === 0 || !orderInfo) {
+    return (
+      <section className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-20">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-indigo-800 mb-6">
+            Order Not Found
+          </h1>
+          <p className="text-lg text-gray-700 mb-10">
+            We couldn't find the order you're looking for.
+          </p>
+          <button
+            onClick={() => navigate("/myorders")}
+            className="inline-block px-10 py-4 bg-indigo-600 text-white text-lg font-semibold rounded-xl hover:bg-indigo-700 transition shadow-lg"
+          >
+            Back to My Orders
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-              <button
-          onClick={() => navigate("/myorders")}
-          className="cursor-pointer mt-22 items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Back to My Orders
-        </button>
-      <div className="mt-30 max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-        {/* Order ID Header */}
-        <div className="bg-blue-600 text-white p-6 text-center">
-          <h1 className="text-2xl font-bold">Order ID: {id}</h1>
-        </div>
+    <section className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen py-12 antialiased">
+      <div className="mt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <button
+                    onClick={() => navigate("/myorders")} 
+                     className="cursor-pointer mb-3 gap-2 text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center px-2 py-2 bg-white border border-indigo-200 rounded-xl text-lg shadow-sm hover:shadow-md hover:border-indigo-400 hover:bg-indigo-50 transition-all duration-300"                  >
+                    <ArrowLeft className="w-5 h-5 text-indigo-700" />
+                    <span>Back to My Orders</span>
+                  </button>
 
-        {/* Products Details */}
-        <div className="p-6 space-y-6">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-            Products
-          </h2>
-          <div className="space-y-4">
-            {filteredOrder &&
-              filteredOrder.items.length > 0 &&
-              filteredOrder.items.map((item) => {
-                return (
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          {/* Gradient Header */}
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 md:p-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-white text-center">
+              Order Details
+            </h2>
+            <p className="text-center text-white/90 mt-2 text-lg">
+              Order ID: <span className="font-semibold">{id}</span>
+            </p>
+            <p className="text-center text-white/80 mt-1">
+              Placed on{" "}
+              {new Date(orderInfo.createdAt).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
+
+          {/* Main Content - Two Columns on Large Screens */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-8">
+            {/* Ordered Products - Left Column */}
+            <div
+              className="bg-white rounded-xl p-6 md:p-8
+                shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
+                dark:shadow-[0_-2px_34px_-14px_rgba(0,0,0,0.2),0_2px_14px_-8px_rgba(0,0,0,0.20)]
+                hover:shadow-[0_-6px_26px_-6px_rgba(0,0,0,0.6),0_8px_16px_-6px_rgba(0,0,0,0.1)]
+                dark:hover:shadow-[0_-8px_36px_-6px_rgba(0,0,0,0.12),0_6px_12px_-2px_rgba(0,0,0,0.14)]
+                transition-shadow duration-500
+              "
+            >
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Ordered Products</h3>
+              <div className="space-y-6">
+                {items.map((item) => (
                   <div
-                    key={item.product?._id}
-                    className="rounded-lg mb-2 border border-gray-200 bg-white p-2 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-4"
+                    key={item.id}
+                    className="flex flex-col sm:flex-row items-start gap-6 bg-gray-50 rounded-xl p-6 shadow-sm"
                   >
-                    <div className="space-y-2 md:flex md:items-center md:justify-between md:gap-4 md:space-y-0">
-                      <img
-                        className="h-25 w-35 dark:block"
-                        src={item.product?.productImage}
-                        alt={item.product?.productName || "Product image"}
-                      />
-                      <div className="flex mt-10 items-center justify-between md:order-3 md:justify-end">
-                        <div className="flex items-center">
-                          <p className="font-medium dark:text-white">
-                            Quantity: {item.quantity}
-                          </p>
-                        </div>
-                        <div className="text-end md:order-4 md:w-32">
-                          <p className="text-base font-bold text-gray-900 dark:text-white">
-                            NPR {item.product?.productPrice}
-                          </p>
-                        </div>
-                      </div>
+                    <img
+                      src={item.Product.productImage}
+                      alt={item.Product.productName}
+                      className="w-full sm:w-32 sm:h-32 object-cover rounded-lg shadow-md"
+                    />
 
-                      <div className="min-w-0 ml-4 flex-1 space-y-4 md:order-2 md:max-w-md">
-                        <p className="text-2xl font-medium text-gray-900 dark:text-white">
-                          {item.product?.productName}
+                    <div className="flex-1 w-full">
+                      <h4 className="text-xl font-semibold text-gray-900">
+                        {item.Product.productName}
+                      </h4>
+                      {item.Product.Category && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          Category: {item.Product.Category.categoryName}
+                        </p>
+                      )}
+                      <p className="text-gray-600 mt-2 line-clamp-3">
+                        {item.Product.productDescription}
+                      </p>
+                      <div className="mt-4 grid grid-cols-2 gap-4 text-lg">
+                        <p className="font-medium">
+                          Quantity: <span className="font-bold">{item.quantity}</span>
+                        </p>
+                        <p className="font-bold text-indigo-600 text-right">
+                          NPR {item.Product.productPrice.toFixed(2)}
                         </p>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-          </div>
-        </div>
+                ))}
+              </div>
+            </div>
 
-        {/* Order Summary */}
-        <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-          <p className="text-xl font-semibold text-gray-900 dark:text-white">
-            Order summary
-          </p>
+            {/* Order Summary - Right Column */}
+            <div
+              className="bg-white rounded-xl p-6 md:p-8
+                shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
+                dark:shadow-[0_-2px_34px_-14px_rgba(0,0,0,0.2),0_2px_14px_-8px_rgba(0,0,0,0.20)]
+                hover:shadow-[0_-6px_26px_-6px_rgba(0,0,0,0.6),0_8px_16px_-6px_rgba(0,0,0,0.1)]
+                dark:hover:shadow-[0_-8px_36px_-6px_rgba(0,0,0,0.12),0_6px_12px_-2px_rgba(0,0,0,0.14)]
+                transition-shadow duration-500
+              "
+            >
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Order Summary</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between text-lg">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-semibold">NPR {totalProductAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-lg">
+                  <span className="text-gray-600">Shipping</span>
+                  <span className="font-semibold text-green-600">NPR {shipping}</span>
+                </div>
+                <div className="flex justify-between text-xl font-bold pt-4 border-t border-gray-300">
+                  <span>Total Amount</span>
+                  <span className="text-indigo-600">NPR {grandTotal.toFixed(2)}</span>
+                </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="font-medium dark:text-white">Order Status</dt>
-                <dd className="font-medium dark:text-white">
-                  {filteredOrder?.orderStatus}
-                </dd>
-              </dl>
+                <div className="mt-8 space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Order Status</span>
+                    <span
+                      className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                        orderInfo.orderStatus === "Pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : orderInfo.orderStatus === "Delivered"
+                          ? "bg-green-100 text-green-800"
+                          : orderInfo.orderStatus === "Cancelled"
+                          ? "bg-red-100 text-red-800"
+                          : orderInfo.orderStatus === "Preparation"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {orderInfo.orderStatus}
+                    </span>
+                  </div>
 
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="text-base font-normal text-gray-500 dark:text-white">
-                  Payment Method
-                </dt>
-                <dd className="text-base font-medium text-gray-900 dark:text-white">
-                  {filteredOrder?.paymentDetails?.method}
-                </dd>
-              </dl>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payment Method</span>
+                    <span className="font-medium">{orderInfo.Payment?.paymentMethod || "N/A"}</span>
+                  </div>
 
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="font-medium dark:text-white">Payment Status</dt>
-                <dd className="font-medium text-green-600">
-                  {filteredOrder?.paymentDetails?.status}
-                </dd>
-              </dl>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payment Status</span>
+                    <span
+                      className={`font-medium ${
+                        orderInfo.Payment?.paymentStatus === "Paid" ? "text-green-600" : "text-yellow-600"
+                      }`}
+                    >
+                      {orderInfo.Payment?.paymentStatus || "Pending"}
+                    </span>
+                  </div>
 
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="font-medium dark:text-white"> Total Products</dt>
-                <dd className="font-medium text-green-600">
-                  {filteredOrder?.items?.length}
-                </dd>
-              </dl>
+                  <h4 className="border-t border-gray-300 pt-4 text-xl font-bold">Customer Details</h4>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Customer</span>
+                    <span className="font-medium">{orderInfo.User?.username}</span>
+                  </div>
 
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="font-medium dark:text-white"> Shipping Price</dt>
-                <dd className="font-medium text-green-600">
-                  NPR 200
-                </dd>
-              </dl>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email</span>
+                    <span className="font-medium">{orderInfo.User?.email}</span>
+                  </div>
 
-                <dl className="flex items-center justify-between gap-4">
-                <dt className="font-medium dark:text-white"> Total Products Price</dt>
-                <dd className="font-medium text-green-600">
-                  NPR {totalProductAmount.toFixed(2)}
-                </dd>
-              </dl>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Phone</span>
+                    <span className="font-medium">{orderInfo.phoneNumber}</span>
+                  </div>
 
-              <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
-                <dt className="text-xl font-bold text-gray-900 dark:text-white">
-                  Total Amount
-                </dt>
-                <dd className="text-xl font-bold text-gray-900 dark:text-white">
-                  NPR {filteredOrder?.totalAmount.toFixed(2)}
-                </dd>
-              </dl>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Shipping Address</span>
+                    <span className="font-medium text-right max-w-xs">
+                      {orderInfo.shippingAddress}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* QR Code Section */}
+          <div
+            className="mx-4 mb-4 rounded-xl p-6 md:p-8 text-center bg-white
+              shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
+              dark:shadow-[0_-2px_34px_-14px_rgba(0,0,0,0.2),0_2px_14px_-8px_rgba(0,0,0,0.20)]
+              hover:shadow-[0_-6px_26px_-6px_rgba(0,0,0,0.6),0_8px_16px_-6px_rgba(0,0,0,0.1)]
+              dark:hover:shadow-[0_-8px_36px_-6px_rgba(0,0,0,0.12),0_6px_12px_-2px_rgba(0,0,0,0.14)]
+              transition-shadow duration-500
+            "
+          >
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Scan QR for Admin View
+            </h3>
+            <div className="inline-block p-4 bg-white rounded-xl shadow-lg">
+              <QRCode value={adminOrderPageUrl} size={180} />
+            </div>
           </div>
 
-          {/* Shipping Address */}
-          <div className="mt-8 space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-          <div>
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="text-base font-normal text-gray-500 dark:text-white">
-                  Shipping Address
-                </dt>
-                <dd className="text-base font-medium text-gray-900 dark:text-white">
-                  {filteredOrder?.shippingAddress}
-                </dd>
-              </dl>
-          </div>
-
-            <div>
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="text-base font-normal text-gray-500 dark:text-white">
-                  Phone Number
-                </dt>
-                <dd className="text-base font-medium text-gray-900 dark:text-white">
-                  {filteredOrder?.phoneNumber}
-                </dd>
-              </dl>
-          </div>
-
-          {/* Delivery Note */}
-          {/* <div>
-              <dl className="flex items-center justify-between gap-4">
-                <dt className="text-base font-normal text-gray-500 dark:text-white">
-                  Delivery Note
-                </dt>
-                <dd className="text-base font-medium text-gray-900 dark:text-white">
-                  Delivery within 24 hours
-                </dd>
-              </dl>
-          </div> */}
-          </div>
-
-
-                  <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-          <p className="text-xl font-semibold text-gray-900 dark:text-white">
-            QR Code
-          </p>
-              <QRCode className="mx-auto" value={adminOrderPageUrl} />
-          </div>
-
-          {/* Actions */}
-          <div className="mt-8 space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-          <div className="p-6 flex space-x-4 justify-center bg-gray-50 dark:bg-gray-700">
-            {/* // Make: if filteredOrder?.orderStatus !== "cancelled" && filteredOrder?.orderStatus !== "delivered" && filteredOrder?.orderStatus !== "preparing" && filteredOrder?.orderStatus !== "in transit" */}
-            {
-              filteredOrder?.orderStatus !== "cancelled" && filteredOrder?.orderStatus !== "delivered" && filteredOrder?.orderStatus !== "preparing" && filteredOrder?.orderStatus !== "in transit" && (
+          {/* Actions Section */}
+          <div
+            className="mx-4 mb-4 rounded-xl p-6 md:p-8 bg-white border-t border-gray-200
+              shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
+              dark:shadow-[0_-2px_34px_-14px_rgba(0,0,0,0.2),0_2px_14px_-8px_rgba(0,0,0,0.20)]
+              hover:shadow-[0_-6px_26px_-6px_rgba(0,0,0,0.6),0_8px_16px_-6px_rgba(0,0,0,0.1)]
+              dark:hover:shadow-[0_-8px_36px_-6px_rgba(0,0,0,0.12),0_6px_12px_-2px_rgba(0,0,0,0.14)]
+              transition-shadow duration-500
+            "
+          >
+            <div className="max-w-2xl mx-auto flex flex-col sm:flex-row gap-4 justify-center">
+              {orderInfo.orderStatus === "Pending" && (
                 <>
-            <button onClick={handleCancelOrder} className="cursor-pointer px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-900 transition duration-200">
-              Cancel Order
-            </button>
-            <button 
-            type="button"
-                              onClick={() =>
-                    navigate(`/myorders/orderdetails/editorders/${id}`)
-                  }
-            className="cursor-pointer flex px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-900 transition duration-200">
-                                <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                  <button
+                    onClick={handleCancelOrder}
+                    className="cursor-pointer px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-medium"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-              Edit Order
-            </button>
-                        <button 
-            type="button"
-            onClick={handleDeleteOrder} className="cursor-pointer flex px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-900 transition duration-200">
-                                <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                    Cancel Order
+                  </button>
+
+                  <button
+                    onClick={() => navigate(`/myorders/orderdetails/editorders/${id}`)}
+                    className="cursor-pointer px-8 py-3 bg-yellow-600 text-white rounded-xl hover:bg-yellow-700 transition font-medium"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-              Delete Order
-            </button>
+                    Edit Order
+                  </button>
                 </>
-              )
-            }
+              )}
+
+              <button
+                onClick={handleDeleteOrder}
+                className="cursor-pointer px-8 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition font-medium"
+              >
+                Delete Order
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

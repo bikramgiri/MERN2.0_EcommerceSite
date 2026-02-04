@@ -76,9 +76,10 @@ export function fetchSingleProduct(productId: string){
         dispatch(setStatus(Status.LOADING));
         try {
           const response = await API.get(`/admin/product/${productId}`);
-          dispatch(setSingleProduct(response.data.data));
-          dispatch(setStatus(Status.SUCCESS));
-          console.log("Product fetched from API:", response.data.data)
+          if(response.status === 200){
+                dispatch(setSingleProduct(response.data.data));
+                dispatch(setStatus(Status.SUCCESS));
+          }
         } catch (error) {
           dispatch(setStatus(Status.ERROR));
           throw error;
