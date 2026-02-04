@@ -10,7 +10,7 @@ router.route('/order')
 
 router.route('/order/:id')
 .patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), userOrderController.updateOrder)
-.get(authMiddleware.isAuthenticated, userOrderController.fetchOrderDetails)
+.get(authMiddleware.isAuthenticated, userOrderController.fetchSingleOrder)
 .delete(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), userOrderController.deleteMyOrder);
 
 router.route('/order/cancel/:id')

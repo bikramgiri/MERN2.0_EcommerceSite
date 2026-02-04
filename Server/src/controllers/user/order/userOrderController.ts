@@ -7,6 +7,8 @@ import OrderDetail from "../../../models/orderDetailsModel";
 import axios from "axios";
 import Product from "../../../models/productModel";
 import Cart from "../../../models/cartModel";
+import User from "../../../models/userModel";
+import Category from "../../../models/categoryModel";
 
 // *Extending Order Model to include paymentId
 class ExtendedOrder extends Order {
@@ -18,6 +20,16 @@ type OrderWithPayment = Order & {
 };
 
 class UserOrderController {
+
+  private static readonly CLOUDINARY_BASE_URL =
+    "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
+
+  // Helper to get full URL from stored filename
+  private static getFullImageUrl(fileName: string | undefined): string {
+    if (!fileName) return "/placeholder.jpg";
+    return `${this.CLOUDINARY_BASE_URL}${fileName}`;
+  }
+
   async createOrder(req: AuthRequest, res: Response): Promise<void> {
     const userId = req.user?.id;
     if (!userId) {
@@ -550,9 +562,23 @@ class UserOrderController {
             });
             return;
       }
+
+        const ordersWithFullImage = orders.map((order) => {
+        const plainOrder = order.toJSON();
+        if (plainOrder.OrderDetails && Array.isArray(plainOrder.OrderDetails)) {
+          plainOrder.OrderDetails = plainOrder.OrderDetails.map((detail: any) => {
+            if (detail.Product && detail.Product.productImage) {
+              detail.Product.productImage = UserOrderController.getFullImageUrl(detail.Product.productImage);
+            }
+            return detail;
+          });
+        }
+        return plainOrder;
+      });
+
       res.status(200).json({
         message: "Orders fetched successfully",
-        data: orders,
+        data: ordersWithFullImage,
       });
     } catch (err) {
       res.status(500).json({
@@ -562,7 +588,7 @@ class UserOrderController {
   }
 
   // *Fetch Order Detais
-  async fetchOrderDetails(req: AuthRequest, res: Response): Promise<void> {
+  async fetchSingleOrder(req: AuthRequest, res: Response): Promise<void> {
     const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({
@@ -585,7 +611,23 @@ class UserOrderController {
         include : [
           {
             model : Product,
-            attributes : ["productName", "productPrice", "productDescription", "productImage", "productTotalStockQty"]
+            // attributes : ["productName", "productPrice", "productDescription", "productImage", "productTotalStockQty"],
+            include: [{
+              model: Category,
+              attributes: ['categoryName']
+            }]
+          },
+          {
+            model : Order,
+            where : { userId }, // ensure the order belongs to the authenticated user
+            // attributes : ["shippingAddress", "phoneNumber", "totalAmount", "orderStatus", "paymentDetails"]
+            include: [{
+              model: Payment,
+              attributes: ['paymentMethod', 'paymentStatus']
+            },{
+              model : User,
+              attributes : ['username', 'email']
+            }]
           }
         ]
       });
@@ -596,10 +638,20 @@ class UserOrderController {
         });
         return;
       }
+      
 
+     // Add full image URL to every Product in the array
+      const orderDetailsWithFullImage = orderDetails.map((detail) => {
+        const plain = detail.toJSON();
+        if (plain.Product && plain.Product.productImage) {
+          plain.Product.productImage = UserOrderController.getFullImageUrl(plain.Product.productImage);
+        }
+        return plain;
+      });
+      
       res.status(200).json({
         message: "Order details fetched successfully",
-        data: orderDetails,
+        data: orderDetailsWithFullImage,
       });
   }catch (err) {
       res.status(500).json({
@@ -662,7 +714,7 @@ class UserOrderController {
     }
   }
 
-  // *Update Order Status (Admin Purpose)
+  // *Update Order Status 
   async updateOrderStatus(req:AuthRequest, res:Response): Promise<void> {
      const { id: orderId } = req.params; // ← safe destructuring
 
