@@ -6,6 +6,8 @@ import { ArrowLeft, Minus, Plus, Trash } from "lucide-react";
 import { PaymentMethod, type ItemsDetails, type OrderData } from "../../globals/types/checkoutTypes";
 import { createOrder } from "../../store/checkoutSlice";
 import { Status } from "../../globals/statuses";
+import Navbar from "../../globals/components/Navbar";
+import Footer from "../../globals/components/Footer";
 
 const CheckOut = () => {
   const navigate = useNavigate();
@@ -171,6 +173,8 @@ const handlePaymentMethod = (e: ChangeEvent<HTMLInputElement>) => {
   }
 
   return (
+    <>
+    <Navbar />
     <section className="py-8 md:py-12 bg-gray-50 pb-16 mt-9 md:pt-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mt-2 mb-6 flex flex-col sm:flex-row items-center gap-1 sm:gap-6 md:gap-40 lg:gap-80">
@@ -624,6 +628,8 @@ const handlePaymentMethod = (e: ChangeEvent<HTMLInputElement>) => {
         </div>
       </div>
     </section>
+    <Footer />
+    </>
   );
 };
 

@@ -7,7 +7,7 @@ import { emptyCart } from "./cartSlice";
 
 const initialState: CheckoutState = {
       items: [],
-      status: Status.LOADING,
+      status: Status.IDLE,
       khaltiUrl: null,
       myOrder: [],
       singleOrder: []
@@ -50,7 +50,7 @@ export function createOrder(data: OrderData) {
       if(response.status === 201){
             dispatch(setItems(response.data.data));
             if(response.data.url){
-                  dispatch(setKhaltiUrl(response.data.url));
+                dispatch(setKhaltiUrl(response.data.url));
             }
             dispatch(setStatus(Status.SUCCESS));
             dispatch(fetchMyOrder());
@@ -69,7 +69,7 @@ export function fetchMyOrder() {
     try {
       const response = await APIAuthenticated.get("/user/order");
       if(response.status === 200){
-            dispatch(setMyOrders(response.data.data))
+            dispatch(setMyOrders(response.data.data.reverse())); // Reverse to show latest orders first
             dispatch(setStatus(Status.SUCCESS));
       }
     } catch (error) {
@@ -122,6 +122,23 @@ export function fetchMySingleOrder(id: string) {
 //       }
 //   }
 // }
+
+export function editMyOrders(id: string, data: OrderData) {
+  return async function editMyOrdersThunk(dispatch: AppDispatch){
+    dispatch(setStatus(Status.LOADING))
+    try{
+      const response = await APIAuthenticated.patch(`/user/order/${id}`, data); 
+      if(response.status === 200){
+            dispatch(setSingleOrder(response.data.data));
+            dispatch(setStatus(Status.SUCCESS));
+            dispatch(fetchMyOrder());
+      }
+    } catch (error) {
+      dispatch(setStatus(Status.ERROR));
+      throw error;
+    }
+  }
+}
 
 export function deleteMyOrders(id: string){
   return async function deleteMyOrdersThunk(dispatch: AppDispatch){

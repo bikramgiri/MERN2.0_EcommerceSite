@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { Status } from "../../../../globals/statuses";
 import { AddToFavorite, removeFavorite } from "../../../../store/userFavouriteSlice";
 import { addToCart, updateCartItems } from "../../../../store/cartSlice";
+import Navbar from "../../../../globals/components/Navbar";
+import Footer from "../../../../globals/components/Footer";
 
 interface SingleProductProps {
   productId: string;
@@ -186,9 +188,10 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
   };
 
   return (
+    <>
+    <Navbar />
     <section className="py-6 md:py-10 bg-gray-50 min-h-screen">
       <div>
-        {/* Back to Products Button - Improved Design */}
         <div className="mt-10 ml-10">
           <button
             onClick={() => navigate("/")} // or navigate("/") if you prefer home
@@ -389,6 +392,8 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
         </div>
       </div>
     </section>
+    <Footer />
+    </>
   );
 };
 

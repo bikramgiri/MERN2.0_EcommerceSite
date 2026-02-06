@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { ShoppingCart, Menu, X, Search, Heart, LogOut, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
-import { logOut } from "../../../store/authSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
+import { logOut } from "../../store/authSlice";
 import { CgProfile } from "react-icons/cg";
 import { GrDashboard } from "react-icons/gr";
-import { fetchUserFavorites } from "../../../store/userFavouriteSlice";
-import { fetchCartItems } from "../../../store/cartSlice";
+import { fetchUserFavorites } from "../../store/userFavouriteSlice";
+import { fetchCartItems } from "../../store/cartSlice";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);           // mobile menu
@@ -117,20 +117,29 @@ const Navbar = () => {
             </span>
           </Link>
 
+          <div className="hidden lg:flex items-center gap-8">
+            <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Home
+            </Link>
+            <Link to="/products" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              Explore Products
+            </Link>
+          </div>
+
           {/* Center - Search bar (desktop only) */}
-          <div className="hidden md:flex flex-1 justify-center max-w-xl mx-8">
-            <div className="relative w-full max-w-lg">
+          <div className="hidden md:flex flex-1 items-center justify-center max-w-md mx-8">
+            <div className="relative w-full">
               <input
                 type="text"
                 placeholder="Search products..."
-                className="w-full pl-11 pr-5 py-2.5 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-500 text-sm shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-500 text-sm shadow-sm"
               />
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
             </div>
           </div>
 
           {/* Right side icons + auth */}
-          <div className="flex items-center gap-5 md:gap-7">
+          <div className="flex items-center gap-4 md:gap-6">
             {/* Notifications Button & Dropdown */}
             {/* {isLoggedIn && (
               <div className="relative" ref={notificationsRef}>
@@ -227,11 +236,6 @@ const Navbar = () => {
                 className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
               >
                 <Heart className="h-6 w-6" />
-                {/* {favouritesCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                    {favouritesCount}
-                  </span>
-                )} */}
                 { favouritesCount > 0 ? (
                   <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                     {favouritesCount}
@@ -260,21 +264,6 @@ const Navbar = () => {
             </div>
             </>
             )}
-
-            {/* Cart (always visible) */}
-            {/* {isLoggedIn && (
-              <Link
-              to="/cart"
-              className="relative text-indigo-700 hover:text-indigo-900 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
-            >
-              <ShoppingCart className="h-6 w-6" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-            )} */}
 
             {/* Desktop - Auth / User Dropdown */}
             <div className="hidden md:flex items-center gap-3">

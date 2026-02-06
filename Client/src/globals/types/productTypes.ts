@@ -27,7 +27,7 @@ export interface Product{
       userId: string,
       categoryId: string
       User: UserData,
-      Category: Category,
+      category: Category,
       Ratings?: number
 }
 

@@ -1,21 +1,3 @@
-// import { useParams } from 'react-router-dom';
-// import SingleProduct from './components/product/SingleProduct';
-
-// const ProductDetails = () => {
-//   // const {id } = useParams<{id: string}>();
-//   return (
-//     <>
-//     <SingleProduct />
-//     </>
-//   )
-// }
-
-// export default ProductDetails
-
-
-
-
-
 import { useParams } from 'react-router-dom';
 import SingleProduct from './components/product/SingleProduct'; // adjust path
 

@@ -1,8 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from './store/store'
-import Navbar from './globals/components/navbar/Navbar'
-import Footer from './globals/components/footer/Footer'
 import Home from './pages/home/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
@@ -15,13 +13,14 @@ import Cart from './pages/cart/Cart'
 import CheckOut from './pages/checkout/CheckOut'
 import MyOrders from './pages/orders/MyOrders'
 import MyOrdersDetails from './pages/orders/MyOrdersDetails'
+import NotFound from './globals/components/NotFound.js'
+import EditMyOrders from './pages/orders/EditMyOrders.js'
 
 function App() {
   return (
     <>
     <Provider store={store}>
     <BrowserRouter>
-    <Navbar />
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/register" element={<Register />} />
@@ -35,8 +34,10 @@ function App() {
       <Route path="/checkout" element={<CheckOut />} />
       <Route path="/myorders" element={<MyOrders />} />
       <Route path="/myorders/orderdetails/:id" element={<MyOrdersDetails />} />
+      <Route path="/myorders/orderdetails/editorders/:id" element={<EditMyOrders />} />
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
-    <Footer />
     </BrowserRouter>
     </Provider>
     </>

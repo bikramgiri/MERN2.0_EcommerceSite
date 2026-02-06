@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import type { AuthFormProps } from "../types";
+import { Eye, EyeOff, Lock, LogIn, Mail, UserIcon, UserPlus } from "lucide-react";
 
 const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordStrength }: AuthFormProps ) => {
   const [showPassword, setShowPassword] = useState(false);
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 py-10 md:py-14 mt-1 sm:mt-4 lg:mt-10 ">
-      <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md sm:max-w-lg lg:max-w-md border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 py-6 md:py-7 ">
+      <div className="bg-white p-5 sm:p-6 md:p-6 rounded-xl shadow-lg w-full max-w-md sm:max-w-lg lg:max-w-md border border-gray-200">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-5">
         {message && <p className="text-green-500 text-center mb-4">{message}</p>}
         {/* {errors?.general && <p className="text-red-500 text-center mb-4">{errors.general}</p>} */}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
@@ -20,7 +20,7 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
               ? "Login to Your Account"
               : "Create a New Account"}
           </h2>
-          <p className="mt-2 text-md text-gray-600">
+          <p className="mt-1 text-md text-gray-600">
             {type === "login"
               ? "Welcome back! Please enter your details."
               : "Join Ecommerce Hub and start shopping today"}
@@ -28,42 +28,44 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
         </div>
 
         {/* Form */}
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-4">
           {type !== "login" && (
-            <div>
+            <div className="relative">
               <label
                 htmlFor="username"
                 className="block text-sm font-medium text-gray-700 mb-1.5"
               >
                 Username
               </label>
+              <UserIcon className="absolute left-3 mt-5 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
               <input
                 type="text"
                 id="username"
                 name="username"
-                value={values.username || ""}
+                value={values.username}
                 onChange={onChange}
-                className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900"
-                placeholder="Enter your username*"
+                className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900"
+                placeholder="John Doe"
               />
               {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
             </div>
           )}
 
-          <div>
+          <div className="relative">
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1.5"
             >
               Email address
             </label>
+            <Mail className="absolute left-3 mt-6 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
             <input
               type="email"
               id="email"
               name="email"
               value={values.email}
               onChange={onChange}
-              className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900"
+              className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900"
               placeholder="Enter your email*"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -76,30 +78,30 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
             >
               Password
             </label>
+            <Lock className="absolute left-3 mt-5 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
             <input
               type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               value={values.password}
               onChange={onChange}
-              className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900 pr-12"
+              className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder-gray-400 text-gray-900"
               placeholder="Enter your password*"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="cursor-pointer absolute inset-y-0 right-0 pr-4 py-13 flex items-center text-gray-500 hover:text-indigo-600 focus:outline-none"
-            >
+               className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/10 flex items-center text-gray-500 hover:text-indigo-600 focus:outline-none"            >
               {showPassword ? (
-                <AiFillEyeInvisible className="h-5 w-5" />
+                <Eye className="h-5 w-5" />
               ) : (
-                <AiFillEye className="h-5 w-5" />
+                <EyeOff className="h-5 w-5" />
               )}
             </button>
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
 
-              <div className="mt-2">
-                {/* Password Strength Indicator */}
+             {type !== "login" && (
+               <div className="mt-2">
             {values.password && (
               <div className="mt-2">
                 <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
@@ -126,6 +128,7 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
               </div>
             )}
               </div>
+             )}
           </div>
            
           <div className={`${type === "login" ? "flex items-center justify-between" : null}`}>
@@ -134,7 +137,6 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
                 type="checkbox"
                 id="rememberandterms"
                 className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
-                required
               />
               <label
                 htmlFor="rememberandterms"
@@ -171,13 +173,14 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
 
             <button
               type="submit"
-              className="cursor-pointer w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 duration-200"
+              className="cursor-pointer w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md  duration-200"
             >
+            {type === "login"? (<LogIn className="size-5" />): (<UserPlus className="size-5" />)}
             {type === "login" ? "Login" : "Sign up"}
             </button>
         </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-4 text-center text-sm text-gray-600">
             {type === "login"
               ? "Don't have an account? "
               : "Already have an account? "
@@ -186,12 +189,11 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
               to={type === "login" ? "/register" : "/login"}
               className="text-indigo-600 font-medium hover:underline"
             >
-                  {type === "login" ? "Sign up here" : "Login here"}
+              {type === "login" ? "Sign up" : "Sign in"}
             </Link>
           </p>
 
-        {/* Social Signup - FIXED for mobile */}
-        <div className="mt-10">
+        <div className="mt-4">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
@@ -204,7 +206,7 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
           </div>
 
           {/* Responsive social buttons - grid on desktop, stack on mobile */}
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Google */}
             <button
               onClick={() =>

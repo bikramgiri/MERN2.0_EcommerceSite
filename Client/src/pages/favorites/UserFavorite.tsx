@@ -13,6 +13,7 @@ import {
   removeFavorite,
 } from "../../store/userFavouriteSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
+import Footer from "../../globals/components/Footer";
 
 const Favourites = () => {
   const navigate = useNavigate();
@@ -48,6 +49,8 @@ const Favourites = () => {
   }
 
   return (
+    <>
+    {/* <Navbar /> */}
     <section className="py-8 md:py-12 bg-gray-50 pb-16 mt-9 md:pt-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mt-1 mb-1 ">
@@ -248,6 +251,8 @@ const Favourites = () => {
         )}
       </div>
     </section>
+    <Footer />
+    </>
   );
 };
 

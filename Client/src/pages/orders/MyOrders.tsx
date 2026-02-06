@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { deleteMyOrders, fetchMyOrder } from "../../store/checkoutSlice";
 import { Status } from "../../globals/statuses";
 import { OrderStatus } from '../../globals/types/checkoutTypes';
+import { Search, Trash } from "lucide-react";
+import Navbar from "../../globals/components/Navbar";
+import Footer from "../../globals/components/Footer";
 
 const MyOrders = () => {
   const dispatch = useAppDispatch();
@@ -79,6 +82,7 @@ const searchedOrders = timeFilteredOrders.filter(
       (order.Payment?.paymentMethod?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
       (order.Payment?.paymentStatus?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
       order.orderStatus.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.totalAmount.toString().includes(searchTerm) ||
       formatDate(order.createdAt).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -105,26 +109,14 @@ const searchedOrders = timeFilteredOrders.filter(
 
   if (orders === null) {
     return (
-      <section className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-indigo-800 mb-6">
-            You have no orders yet
-          </h1>
-          <p className="text-lg text-gray-700 mb-10">
-            Looks like you haven't placed any orders yet.
-          </p>
-          <Link
-            to="/"
-            className="inline-block px-10 py-4 bg-indigo-600 text-white text-lg font-semibold rounded-xl hover:bg-indigo-700 transition shadow-lg"
-          >
-            Start Shopping
-          </Link>
-        </div>
-      </section>
+      <>
+      </>
     );
   }
 
   return (
+   <>
+   <Navbar />
     <section className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen py-12 antialiased">
       <div className="mt-8 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
              {message && (
@@ -135,91 +127,18 @@ const searchedOrders = timeFilteredOrders.filter(
           </div>
         )}
         <div className="bg-white rounded-xl shadow-md p-6 overflow-hidden">
-          {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-700 pb-4 mb-6">
-            <h2 className="text-2xl font-bold text-blue-500 mb-4 sm:mb-0">
-              My Orders
-            </h2>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative">
-                <select
-                  onChange={(e) => setSelectedItem(e.target.value)}
-                  id="order-type"
-                  className="w-full sm:w-40 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                  <option value="all-orders">All Orders</option>
-                  <option value="pending">Pending</option>
-                  <option value="pre-order">Pre-order</option>
-                  <option value="transit">In Transit</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-              <span className="hidden font-medium sm:inline text-gray-400 mt-2">
-                from
-              </span>
-              <div className="relative mr-8">
-                <select
-                  onChange={(e) => setSelectedTime(e.target.value)}
-                  id="duration"
-                  className="w-full sm:w-40 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                  <option value="all">All</option>
-                  <option value="today">Today</option>
-                  <option value="this-week">This Week</option>
-                  <option value="this-month">This Month</option>
-                  <option value="last-3-months">Last 3 Months</option>
-                  <option value="last-6-months">Last 6 Months</option>
-                  <option value="this-year">This Year</option>
-                </select>
-              </div>
-              <div className="relative">
-                <input
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  type="date"
-                  className="p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500  text-gray-700"
-                  placeholder="Search..."
-                />
-              </div>
-              <div className="relative">
-                <input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  type="text"
-                  className="p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500  text-gray-700"
-                  placeholder="Search..."
-                />
-                <svg
-                  className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div> */}
-
            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 md:p-8">
             <h2 className="text-3xl md:text-4xl font-bold text-white text-center">
               My Orders
             </h2>
           </div>
 
-           {/* Filters */}
           <div className="p-6 border-b border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <select
                 value={selectedItem}
                 onChange={(e) => setSelectedItem(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="cursor-pointer px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
               >
                 <option value="all-orders">All Orders</option>
                 <option value="Pending">Pending</option>
@@ -232,7 +151,7 @@ const searchedOrders = timeFilteredOrders.filter(
               <select
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="cursor-pointer px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
               >
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
@@ -247,7 +166,7 @@ const searchedOrders = timeFilteredOrders.filter(
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="cursor-pointer px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
               />
 
               <div className="relative">
@@ -258,26 +177,14 @@ const searchedOrders = timeFilteredOrders.filter(
                   placeholder="Search orders..."
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
                 />
-                <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
               </div>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-200 border-b border-gray-200">
                 <tr className=" text-gray-600 uppercase tracking-wider text-xs font-semibold">
                   <th className="py-4 px-4 text-center">Order ID</th>
                   <th className="py-4 px-4 text-center">Date</th>
@@ -331,12 +238,6 @@ const searchedOrders = timeFilteredOrders.filter(
                         {order.Payment?.paymentStatus || "Pending"}
                       </td>
                       <td className="py-4 px-4 flex justify-center space-x-2">
-                        {/* <button
-                          type="button"
-                          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                        >
-                          Cancel Order
-                        </button> */}
                         <button
                           onClick={() => {
                             navigate(`/myorders/orderdetails/${order.id}`);
@@ -350,6 +251,7 @@ const searchedOrders = timeFilteredOrders.filter(
                           // onClick={handleDeleteOrder}
                           className="cursor-pointer px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                         >
+                          <Trash className="inline-block w-4 h-4 mr-1 mb-1" />
                           Delete
                         </button>
                       </td>
@@ -405,6 +307,8 @@ const searchedOrders = timeFilteredOrders.filter(
         </div>
       </div>
     </section>
+   <Footer />
+   </>
   );
 };
 

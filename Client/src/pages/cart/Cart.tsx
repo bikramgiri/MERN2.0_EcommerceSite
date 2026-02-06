@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { removeFromCart, updateCartItems } from "../../store/cartSlice";
 import { ArrowLeft, Loader2, Minus, Plus, Trash } from "lucide-react";
 import { Status } from "../../globals/statuses";
+import Footer from "../../globals/components/Footer";
+import Navbar from "../../globals/components/Navbar";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -60,6 +62,8 @@ const Cart = () => {
   }
 
   return (
+    <>
+    <Navbar />
     <section className=" py-8 md:py-12 bg-gray-50 pb-16 mt-9 md:pt-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -276,6 +280,8 @@ const Cart = () => {
         </div>
       </div>
     </section>
+    <Footer />
+    </>
   );
 };
 
