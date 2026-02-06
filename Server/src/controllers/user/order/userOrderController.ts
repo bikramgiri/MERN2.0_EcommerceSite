@@ -95,6 +95,29 @@ class UserOrderController {
       return;
     }
 
+    // calculate total amount as product price * quantity for each item and compare with totalAmount sent by client
+    let calculatedTotal = 0;
+    let shippingFee = 70
+    for (const item of items) {
+      const product = await Product.findByPk(item.productId);
+      if (!product) {
+        res.status(400).json({
+          message: `Product with ID ${item.productId} not found.`,
+          field: "items"
+        });
+        return;
+      }
+      calculatedTotal += product.productPrice * item.quantity + shippingFee;
+    }
+
+    if (calculatedTotal !== totalAmount) {
+      res.status(400).json({
+        message: "Total amount does not match the sum of product prices and quantities.",
+        field: "totalAmount"
+      });
+      return;
+    }
+
     // create order
     try {
       const paymentData = await Payment.create({
@@ -105,7 +128,7 @@ class UserOrderController {
         userId,
         phoneNumber: phone,
         shippingAddress,
-        totalAmount,
+        totalAmount: calculatedTotal,
         items: items,
         paymentId: paymentData.id,
         paymentDetails
@@ -140,7 +163,7 @@ class UserOrderController {
         const data = {
           return_url: "http://localhost:4000/khalti-payment-success",
           website_url: "http://localhost:4000",
-          amount: totalAmount * 100, //in paisa
+          amount: calculatedTotal * 100, //in paisa
           purchase_order_id: newOrder.id.toString(), //unique id for order
           purchase_order_name: "orderName_" + newOrder.id,
         };
@@ -321,18 +344,10 @@ class UserOrderController {
 
   const phone = String(phoneNumber).trim();
 
-  // Phone number validation
-  if (phone.length !== 10) {
+// Phone validation
+  if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
     res.status(400).json({ 
-      message: "Phone number must be exactly 10 digits long.",
-      field: "phoneNumber"
-    });
-    return;
-  }
-
-  if (!/^\d{10}$/.test(phone)) {
-    res.status(400).json({ 
-      message: "Phone number must contain only digits (0-9).",
+      message: "Phone number must be exactly 10 digits.",
       field: "phoneNumber"
     });
     return;
@@ -359,7 +374,8 @@ class UserOrderController {
     const order = await Order.findOne({
       where: {
         id: orderId,
-        userId  // ← Security: only owner can update
+        userId ,
+        orderStatus: OrderStatus.Pending
       }
     });
 
@@ -370,11 +386,46 @@ class UserOrderController {
       return;
     }
 
+    // Validate products, quantities, and recalculate total
+    let calculatedTotal = 0;
+    const shippingFee = 70; // Match your frontend
+
+    for (const item of items) {
+      const product = await Product.findByPk(item.productId);
+      if (!product) {
+        res.status(400).json({
+          message: `Product with ID ${item.productId} not found.`,
+          field: "items"
+        });
+        return;
+      }
+
+      if (item.quantity < 1) {
+        res.status(400).json({
+          message: "Quantity must be at least 1.",
+          field: "items"
+        });
+        return;
+      }
+
+      if (item.quantity > product.productTotalStockQty) {
+        res.status(400).json({
+          message: `Only ${product.productTotalStockQty} units available for ${product.productName}.`,
+          field: "items"
+        });
+        return;
+      }
+
+      calculatedTotal += product.productPrice * item.quantity;
+    }
+    calculatedTotal += shippingFee;
+  
+
     // 2. Update main order fields
     await order.update({
       phoneNumber: phone,
       shippingAddress,
-      totalAmount
+      totalAmount: calculatedTotal,
     });
     const extendedOrder = order as ExtendedOrder;
 
@@ -433,34 +484,45 @@ class UserOrderController {
       );
 
       const khaltiResponse: KhaltiResponse = response.data;
-      payment.pidx = khaltiResponse.pidx;
-      await payment.save();
+      if (payment) {
+        payment.pidx = khaltiResponse.pidx;
+        await payment.save();
+      }
 
       paymentUrl = khaltiResponse.payment_url;
     }
 
     // 6. Fetch updated order with relations (same as you wanted)
-    const updatedOrder = await Order.findByPk(orderId, {
+const updatedOrderDetails = await OrderDetail.findAll({
+      where: { orderId },
       include: [
         {
-          model: Payment,
-          attributes: ['paymentMethod', 'paymentStatus']
+          model: Product,
+          include: [{ model: Category, attributes: ['categoryName'] }]
         },
         {
-          model: OrderDetail,
-          attributes: ['quantity'],
-          include: [{
-            model: Product,
-            attributes: ['productName'] 
-          }]
+          model: Order,
+          where: { userId },
+          include: [
+            { model: Payment, attributes: ['paymentMethod', 'paymentStatus'] },
+            { model: User, attributes: ['username', 'email'] }
+          ]
         }
       ]
     });
 
+    const orderDetailsWithFullImage = updatedOrderDetails.map((detail) => {
+      const plain = detail.toJSON();
+      if (plain.Product?.productImage) {
+        plain.Product.productImage = UserOrderController.getFullImageUrl(plain.Product.productImage);
+      }
+      return plain;
+    });
+
     res.status(200).json({
       message: "Order updated successfully",
-      order: updatedOrder,
-      ...(paymentUrl && { paymentUrl }) // only include if Khalti
+      data: orderDetailsWithFullImage,
+      ...(paymentUrl && { paymentUrl })
     });
 
   } catch (err) {
