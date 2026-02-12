@@ -54,6 +54,8 @@ import userOrderRoute from './routes/user/userOrderRoute';
 import adminOrderRoute from './routes/admin/adminOrderRoute';
 import userRoute from './routes/user/userRoute';
 import categoryController from './controllers/admin/category/categoryController';
+import dataServiceRoute from './routes/admin/dataServiceRoute';
+import adminUserRoutes from './routes/admin/adminUserRoutes';
 
 // *Give access to storage folder images
 app.use("/src/storage", express.static("storage")); // Serve static files from the storage directory
@@ -65,6 +67,8 @@ app.use('/auth', authRoute);
 app.use('/admin', productRoute);
 app.use('/admin', categoryRoute);
 app.use('/admin', adminOrderRoute);
+app.use('/admin', dataServiceRoute);
+app.use('/admin', adminUserRoutes);
 app.use('/user', cartRoute);
 app.use('/user', userOrderRoute);
 app.use('/user', userRoute);
