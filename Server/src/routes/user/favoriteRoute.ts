@@ -1,6 +1,6 @@
 import express, {Router} from 'express';
 import catchAsyncError from '../../services/catchAsyncError';
-import UserController from '../../controllers/user/userController';
+import UserController from '../../controllers/user/favourite/favoriteController';
 import authMiddleware, { Role } from '../../middleware/authMiddleware';
 const router:Router = express.Router();
 

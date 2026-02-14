@@ -1,10 +1,10 @@
 import { Response } from "express";
-import Product from "../../models/productModel";
-import User from "../../models/userModel";
-import { AuthRequest } from "../../middleware/authMiddleware";
-import Category from "../../models/categoryModel";
+import Product from "../../../models/productModel";
+import User from "../../../models/userModel";
+import { AuthRequest } from "../../../middleware/authMiddleware";
+import Category from "../../../models/categoryModel";
 
-class UserController {
+class FavouriteController {
   private static readonly CLOUDINARY_BASE_URL =
     "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
 
@@ -60,7 +60,7 @@ class UserController {
         const plainProduct = product.toJSON();
         const productWithFullImage = {
           ...plainProduct,
-          productImage: UserController.getFullImageUrl(plainProduct.productImage),
+          productImage: FavouriteController.getFullImageUrl(plainProduct.productImage),
         };
 
         res.status(200).json({
@@ -126,7 +126,7 @@ class UserController {
       // Transform each favorite product to include full Cloudinary URL
       const favoritesWithFullImage = favoriteProducts.map((plain: any) => ({
         ...plain,
-        productImage: UserController.getFullImageUrl(plain.productImage),
+        productImage: FavouriteController.getFullImageUrl(plain.productImage),
       }));
 
       res.status(200).json({
@@ -197,4 +197,4 @@ class UserController {
   }
 }
 
-export default UserController;
+export default FavouriteController;
