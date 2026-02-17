@@ -184,7 +184,8 @@ private static readonly CLOUDINARY_BASE_URL =
             attributes: ["id", "username"],
           },
         ],
-      });
+      })
+      // arrange recently added products first
 
     //   // Construct full Cloudinary URLs
     // const baseUrl = "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
@@ -205,6 +206,8 @@ private static readonly CLOUDINARY_BASE_URL =
           productImage: ProductController.getFullImageUrl(plain.productImage),
         };
       });
+      // arrange products by recently added first
+      productsWithFullImage.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       res.status(200).json({
         message: "Products fetched successfully",
@@ -298,7 +301,6 @@ private static readonly CLOUDINARY_BASE_URL =
   public static async updateProduct(req: Request, res: Response): Promise<void> {
     try {
       const { id: productId } = req.params;
-      // Type guard
       if (!productId || typeof productId !== 'string' || productId.trim() === '') {
         res.status(400).json({ message: "Valid Product ID is required" });
         return;
@@ -315,6 +317,7 @@ private static readonly CLOUDINARY_BASE_URL =
       if (!product) {
         res.status(404).json({
           message: "Product not found",
+          field: "id",
         });
         return;
       }
@@ -325,6 +328,7 @@ private static readonly CLOUDINARY_BASE_URL =
       if (productName.trim().length < 2) {
         res.status(400).json({
           message: "Product name must be at least 2 characters long",
+          field: "productName",
         });
         return;
       }
@@ -342,6 +346,7 @@ private static readonly CLOUDINARY_BASE_URL =
       if (productDescription.length < 5) {
         res.status(400).json({
           message: "Product description must be at least 5 characters long",
+          field: "productDescription",
         });
         return;
       }
@@ -351,6 +356,7 @@ private static readonly CLOUDINARY_BASE_URL =
       if (isNaN(price) || price <= 0) {
         res.status(400).json({
           message: "Product price must be a number > 0",
+          field: "productPrice",
         });
         return;
       }
@@ -360,6 +366,7 @@ private static readonly CLOUDINARY_BASE_URL =
       if (isNaN(stockQty) || stockQty < 0) {
         res.status(400).json({
           message: "Product stock quantity must be a number >= 0",
+          field: "productTotalStockQty",
         });
         return;
       }

@@ -70,17 +70,20 @@ class CategoryController {
     });
     res.status(201).json({
       message: "Category added successfully",
-      category: newCategory,
+      data: newCategory,
     });
   }
 
   // *Get All Categories
   async getAllCategories(req: Request, res: Response): Promise<void> {
-    const categories = await Category.findAll();
+    // fetch recently added categories first
+    const categories = await Category.findAll({
+      order: [["createdAt", "DESC"]], 
+    });
 
     res.status(200).json({
       message: "Categories retrieved successfully",
-      categories,
+      data: categories,
     });
   }
 
@@ -104,7 +107,7 @@ class CategoryController {
 
     res.status(200).json({
       message: "Category retrieved successfully",
-      category,
+      data: category,
     });
   }
 
@@ -166,7 +169,7 @@ class CategoryController {
     
     res.status(200).json({
       message: "Category updated successfully",
-      category: updatedCategory,
+      data: updatedCategory,
     });
   }
 

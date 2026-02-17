@@ -14,7 +14,10 @@ cloudinary.config({
 const cloudinaryUpload = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      // return res.status(400).json({ message: "No file uploaded" });
+      // * OR
+      // No file uploaded → optional for update, just proceed
+      return next(); // If no file, just proceed to the next middleware/controller without uploading
     }
 
     console.log("Uploading to Cloudinary:", req.file.originalname);
