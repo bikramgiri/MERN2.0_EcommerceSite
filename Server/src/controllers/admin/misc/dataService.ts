@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Product from "../../../models/productModel";
 import User from "../../../models/userModel";
 import Order from "../../../models/orderModel";
+import Category from "../../../models/categoryModel";
 
 
 class DataService {
@@ -9,6 +10,7 @@ class DataService {
       const products = (await Product.findAll()).length;
       const users = (await User.findAll({ where: { role: "customer" } })).length;
       const orders = (await Order.findAll()).length;
+      const categories = (await Category.findAll()).length
 
       const allProducts = await Product.findAll();
       const allUsers = await User.findAll({ where: { role: "customer" } });
@@ -20,6 +22,7 @@ class DataService {
              }
             ]
       })
+      const allCategories = await Category.findAll();
 
       res.status(200).json({
             message: "Data fetched successfully",
@@ -27,9 +30,11 @@ class DataService {
                   products,
                   users,
                   orders,
+                  categories,
                   allProducts,
                   allUsers,
-                  allOrders
+                  allOrders,
+                  allCategories
             }
       });
   }

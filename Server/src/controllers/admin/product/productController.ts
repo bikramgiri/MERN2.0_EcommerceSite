@@ -519,7 +519,7 @@ private static readonly CLOUDINARY_BASE_URL =
     try {
       const productOrders = await Product.findAll({
         where: { id: productId },
-        attributes: ['id', 'productName', 'productPrice', 'productDescription', 'productImage', 'productTotalStockQty'],
+        attributes: ['id', 'productName', 'productTotalStockQty'],
         include: [  
           { 
             model: OrderDetail, 
@@ -527,7 +527,7 @@ private static readonly CLOUDINARY_BASE_URL =
             include: [
               { 
                 model: Order,
-                attributes: ['id', 'orderStatus', 'totalAmount', 'shippingAddress', 'phoneNumber'],
+                attributes: ['id', 'orderStatus', 'totalAmount', 'shippingAddress', 'phoneNumber', "createdAt"],
                 include: [
                   {
                     model: User,

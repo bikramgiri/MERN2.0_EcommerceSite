@@ -35,6 +35,7 @@ class CategoryController {
     if (!categoryName || !categoryDescription) {
        res.status(400).json({
         message: "Please provide all required fields",
+        field: "data incomplete"
       });
       return;
     }
@@ -43,6 +44,7 @@ class CategoryController {
     if (categoryName.length < 2) {
        res.status(400).json({
         message: "Category name must be at least 2 characters long",
+        field: "categoryName"
       });
       return;
     }
@@ -52,6 +54,7 @@ class CategoryController {
     if (existingCategory) {
        res.status(409).json({
         message: "Category already exists",
+        field: "categoryName"
       });
       return;
     }
@@ -60,6 +63,7 @@ class CategoryController {
     if (categoryDescription.length < 5) {
       res.status(400).json({
         message: "Category description must be at least 5 characters long",
+        field: "categoryDescription"
       });
       return;
     }
@@ -117,7 +121,10 @@ class CategoryController {
 
       // Type guard
       if (!categoryId || typeof categoryId !== 'string' || categoryId.trim() === '') {
-        res.status(400).json({ message: "Valid Category ID is required" });
+        res.status(400).json({ 
+          message: "Valid Category ID is required",
+          field: "id"
+         });
         return;
       }
 
@@ -125,6 +132,7 @@ class CategoryController {
     if (!categoryName && !categoryDescription) {
       res.status(400).json({
         message: "Please provide categoryName or categoryDescription to update",
+        field: "data incomplete"
       });
       return;
     }
@@ -133,23 +141,25 @@ class CategoryController {
     if (categoryName.length < 2) {
        res.status(400).json({
         message: "Category name must be at least 2 characters long",
+        field: "categoryName"
       });
       return;
     }
 
-    // Validate if category already exists
-    const existingCategory = await Category.findOne({ where: { categoryName } });
-    if (existingCategory) {
-       res.status(409).json({
-        message: "Category already exists",
-      });
-      return;
-    }
+    // // Validate if category already exists
+    // const existingCategory = await Category.findOne({ where: { categoryName } });
+    // if (existingCategory) {
+    //    res.status(409).json({
+    //     message: "Category already exists",
+    //   });
+    //   return;
+    // }
 
     // Validate description length
     if (categoryDescription.length < 5) {
       res.status(400).json({
         message: "Category description must be at least 5 characters long",
+        field: "categoryDescription"
       });
       return;
     }
