@@ -12,6 +12,16 @@ class ExtendedOrder extends Order {
 }
 
 class AdminOrderController {
+
+       private static readonly CLOUDINARY_BASE_URL =
+    "https://res.cloudinary.com/ditfnlowl/image/upload/v1769440422/Mern2_Ecommerce_Website/";
+
+  // Helper to get full URL from stored filename
+  private static getFullImageUrl(fileName: string | undefined): string {
+    if (!fileName) return "/placeholder.jpg";
+    return `${this.CLOUDINARY_BASE_URL}${fileName}`;
+  }
+
       // *Fetch all orders
       async getAllOrders(req: Request, res: Response): Promise<void> {
             try {
@@ -48,9 +58,22 @@ class AdminOrderController {
                         return;
                   }
 
+                    const ordersWithFullImage = orders.map((order) => {
+        const plainOrder = order.toJSON();
+        if (plainOrder.OrderDetails && Array.isArray(plainOrder.OrderDetails)) {
+          plainOrder.OrderDetails = plainOrder.OrderDetails.map((detail: any) => {
+            if (detail.Product && detail.Product.productImage) {
+              detail.Product.productImage = AdminOrderController.getFullImageUrl(detail.Product.productImage);
+            }
+            return detail;
+          });
+        }
+        return plainOrder;
+      });
+
                   res.status(200).json({ 
                         message: 'Orders fetched successfully', 
-                        data: orders 
+                        data: ordersWithFullImage
                   });
             } catch (error) {
                   res.status(500).json({ 
@@ -103,9 +126,19 @@ class AdminOrderController {
                         return;
                   }
 
+            const ordersWithFullImage = order.toJSON();
+        if (ordersWithFullImage.OrderDetails && Array.isArray(ordersWithFullImage.OrderDetails)) {
+          ordersWithFullImage.OrderDetails = ordersWithFullImage.OrderDetails.map((detail: any) => {
+            if (detail.Product && detail.Product.productImage) {
+              detail.Product.productImage = AdminOrderController.getFullImageUrl(detail.Product.productImage);
+            }
+            return detail;
+          });
+            }
+
                   res.status(200).json({ 
                         message: 'Order fetched successfully', 
-                        data: order 
+                        data: ordersWithFullImage
                   });
             } catch (error) {
                   res.status(500).json({ 
@@ -113,6 +146,7 @@ class AdminOrderController {
                   });
             }
       }
+
 
       // *update order status
       async updateOrderStatus(req: Request, res: Response): Promise<void> {
