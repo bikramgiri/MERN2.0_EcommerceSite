@@ -5,6 +5,7 @@ import Payment from "../../../models/paymentModel";
 import OrderDetail from "../../../models/orderDetailsModel";
 import User from "../../../models/userModel";
 import Product from "../../../models/productModel";
+import Category from "../../../models/categoryModel";
 
 // *Extending Order Model to include paymentId
 class ExtendedOrder extends Order {
@@ -108,6 +109,11 @@ class AdminOrderController {
                               "productImage",
                               "productTotalStockQty",
                             ],
+                            include: [
+                              { model: Category,
+                                    attributes: ["categoryName"]
+                              }
+                            ]
                           },
                         ],
                       },

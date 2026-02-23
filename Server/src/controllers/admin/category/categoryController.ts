@@ -82,8 +82,10 @@ class CategoryController {
   async getAllCategories(req: Request, res: Response): Promise<void> {
     // fetch recently added categories first
     const categories = await Category.findAll({
-      order: [["createdAt", "DESC"]], 
+      order: [["createdAt", "DESC"]]
     });
+    // fetch newly added categories first
+    
 
     res.status(200).json({
       message: "Categories retrieved successfully",

@@ -33,6 +33,7 @@ import userRoute from './routes/user/favoriteRoute';
 import categoryController from './controllers/admin/category/categoryController';
 import dataServiceRoute from './routes/admin/dataServiceRoute';
 import adminUserRoutes from './routes/admin/adminUserRoutes';
+import adminProfileRoutes from './routes/admin/adminProfileRoutes';
 
 // *Give access to storage folder images
 app.use("/src/storage", express.static("storage")); // Serve static files from the storage directory
@@ -46,6 +47,7 @@ app.use('/admin', categoryRoute);
 app.use('/admin', adminOrderRoute);
 app.use('/admin', dataServiceRoute);
 app.use('/admin', adminUserRoutes);
+app.use('/admin', adminProfileRoutes);
 app.use('/user', cartRoute);
 app.use('/user', userOrderRoute);
 app.use('/user', userRoute);

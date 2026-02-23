@@ -20,8 +20,6 @@ const cloudinaryUpload = async (req: Request, res: Response, next: NextFunction)
       return next(); // If no file, just proceed to the next middleware/controller without uploading
     }
 
-    console.log("Uploading to Cloudinary:", req.file.originalname);
-
     const uploadStream = await cloudinary.uploader.upload_stream({
         folder: 'Mern2_Ecommerce_Website',
         transformation: [{ width: 500, height: 500, crop: 'limit' }],
