@@ -1,6 +1,6 @@
 import { Response } from "express";
-import { AuthRequest } from "../../../middleware/authMiddleware";
-import User from "../../../models/userModel";
+import { AuthRequest } from "../../middleware/authMiddleware";
+import User from "../../models/userModel";
 const bcrypt = require("bcrypt");
 
 class ProfileController {

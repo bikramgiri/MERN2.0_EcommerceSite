@@ -6,6 +6,7 @@ export interface AuthRequest extends Request {
   user?: {
     username: string;
     email: string;
+    emails?: { value: string }[]; // For Google profile emails
     // password: string;
     role: string;
     id: string;
@@ -27,18 +28,32 @@ class authMiddleware {
   ): Promise<void> {
     try {
       let token: string | undefined;
+      
+      // const authHeader = req.headers.authorization;
+      // if (authHeader) {
+      //   if (authHeader.startsWith("Bearer ")) {
+      //     token = authHeader.substring(7); // Remove "Bearer " prefix
+      //   } else {
+      //     token = authHeader; // Accept plain token (common in Postman manual header)
+      //   }
+      // }
+
+      // *OR
+
       const authHeader = req.headers.authorization;
-
-
       if (authHeader) {
-        if (authHeader.startsWith("Bearer ")) {
-          token = authHeader.substring(7); // Remove "Bearer " prefix
-        } else {
-          token = authHeader; // Accept plain token (common in Postman manual header)
-        }
+        token = authHeader.startsWith("Bearer ") 
+          ? authHeader.substring(7) 
+          : authHeader;
       }
 
+      // if (!token && req.cookies?.token) {
+      //   token = req.cookies.token;
+      //   console.log("Using token from cookie:", token ? "found" : "not found");
+      // }
+
       if (!token) {
+        console.log("No token provided in header or cookie");
         res.status(401).json({
           message: "No token provided",
         });
@@ -82,7 +97,7 @@ class authMiddleware {
       //   }
       // );
 
-      // verify token
+      // *verify token
       jwt.verify(
         token,
         secret,
@@ -99,8 +114,15 @@ class authMiddleware {
             });
             return;
           } else {
-            // check if that decoded user exists or not
-            const useData = await User.findByPk(decoded.id);
+            const userId = decoded.id;
+            if (!userId) {
+              res.status(401).json({
+                message: "Unauthorized! Invalid token payload",
+              });
+              return;
+            }
+
+            const useData = await User.findByPk(userId);
             if (!useData) {
               res.status(404).json({
                 message: "User not found",

@@ -40,15 +40,21 @@ class User extends Model {
 
       @Column({
             type : DataType.STRING,
-            allowNull : false
+            allowNull : true
       })
       declare password : string;
 
-      // @Column({
-      //       type : DataType.STRING,
-      //       allowNull : true 
-      // })
-      // declare avatar : string;
+      @Column({
+            type : DataType.STRING,
+            allowNull : true 
+      })
+      declare avatar : string;
+
+       @Column({
+            type : DataType.STRING,
+            allowNull : true 
+      })
+      declare googleId : string;
 
       @Column({
             type : DataType.STRING,

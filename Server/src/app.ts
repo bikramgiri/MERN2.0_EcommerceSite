@@ -7,13 +7,13 @@ const app:Application = express();
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
 }));
-app.use(cookieParser());
 
 // *Database connection
 import './database/connection';
@@ -21,6 +21,21 @@ import './database/connection';
 // *Admin Seeder
 import adminSeeder from './adminSeeder';
 adminSeeder();
+
+// Google Login
+const session = require('express-session');
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+  }
+}));
+import googleAuth from './services/googleAuth';
+app.use(googleAuth.passport.initialize());
+app.use(googleAuth.passport.session());
 
 //*Routes
 import authRoute from './routes/auth/authRoute';
@@ -33,7 +48,7 @@ import userRoute from './routes/user/favoriteRoute';
 import categoryController from './controllers/admin/category/categoryController';
 import dataServiceRoute from './routes/admin/dataServiceRoute';
 import adminUserRoutes from './routes/admin/adminUserRoutes';
-import adminProfileRoutes from './routes/admin/adminProfileRoutes';
+import profileRoutes from './routes/global/profileRoutes';
 
 // *Give access to storage folder images
 app.use("/src/storage", express.static("storage")); // Serve static files from the storage directory
@@ -47,7 +62,7 @@ app.use('/admin', categoryRoute);
 app.use('/admin', adminOrderRoute);
 app.use('/admin', dataServiceRoute);
 app.use('/admin', adminUserRoutes);
-app.use('/admin', adminProfileRoutes);
+app.use('/', profileRoutes);
 app.use('/user', cartRoute);
 app.use('/user', userOrderRoute);
 app.use('/user', userRoute);
