@@ -1,6 +1,4 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import store from './store/store'
 import Home from './pages/home/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
@@ -15,11 +13,18 @@ import MyOrders from './pages/orders/MyOrders'
 import MyOrdersDetails from './pages/orders/MyOrdersDetails'
 import NotFound from './globals/components/NotFound.js'
 import EditMyOrders from './pages/orders/EditMyOrders.js'
+import { useAppDispatch } from './hooks/hooks.js'
+import { useEffect } from 'react'
+import { handleGoogleLogin } from './store/authSlice.js'
 
 function App() {
+
+   const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(handleGoogleLogin());
+  }, [dispatch]);
+
   return (
-    <>
-    <Provider store={store}>
     <BrowserRouter>
     <Routes>
       <Route path="/" element={<Home />} />
@@ -39,8 +44,6 @@ function App() {
       <Route path="*" element={<NotFound />} />
     </Routes>
     </BrowserRouter>
-    </Provider>
-    </>
   )
 }
 

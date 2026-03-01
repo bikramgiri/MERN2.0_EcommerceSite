@@ -28,10 +28,34 @@ const Navbar = () => {
   // const unreadNotifications = 2;   
   const favouritesCount = favorites?.length;       
  
-  // Check token in localStorage for persistent login state on refresh
+  // Check token in localStorage and in cookies for persistent login state on refresh 
   const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const effectiveToken = token || storedToken;
   const isLoggedIn = !!effectiveToken;
+
+  // *OR
+
+//    // Get token from localStorage or cookie
+// const getEffectiveToken = () => {
+//   // 1. localStorage first (higher priority if exists)
+//   let token = localStorage.getItem("token");
+
+//   // 2. fallback to cookie
+//   if (!token) {
+//     const tokenCookie = document.cookie
+//       .split('; ')
+//       .find(row => row.startsWith('token='));
+//     if (tokenCookie) {
+//       token = tokenCookie.split('=')[1];
+//     }
+//   }
+
+//   return token;
+// };
+
+// const effectiveToken = token || getEffectiveToken();
+// const isLoggedIn = !!effectiveToken; // true if token exists in either place 
+
 
 
   useEffect(() => {
@@ -87,9 +111,13 @@ const Navbar = () => {
     if (user?.avatar) {
       return (
         <img
-          className={`${avatarSize} rounded-full object-cover border-2 border-indigo-200`}
-          src={user.avatar}
-          alt="User avatar"
+          className={`${avatarSize} rounded-full object-cover border-2 border-blue-200`}
+          src={user?.avatar}
+          alt={`${user?.username}'s avatar`}
+        //   onError={(e) => {
+        //   console.log("Avatar load error:", e);
+        //   e.currentTarget.src = "https://via.placeholder.com/40?text=User"; // fallback
+        // }}
         />
       );
     }
@@ -98,7 +126,7 @@ const Navbar = () => {
 
     return (
       <div
-        className={`${avatarSize} rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold border-2 border-indigo-200 ${textSize}`}
+        className={`${avatarSize} rounded-full bg-blue-600 text-white flex items-center justify-center font-bold border-2 border-blue-200 ${textSize}`}
       >
         {initials}
       </div>

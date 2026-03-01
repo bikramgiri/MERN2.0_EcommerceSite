@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL 
+
 // For unlogin user
 export const API = axios.create({
-  baseURL: "http://localhost:4000",
-  // withCredentials: true, // cookies
+  baseURL: BASE_URL,
+  withCredentials: true, // cookies
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -12,12 +14,12 @@ export const API = axios.create({
 
 // For Login user
 export const APIAuthenticated = axios.create({
-  baseURL: "http://localhost:4000",
-  // withCredentials: true, // cookies
+  baseURL: BASE_URL,
+  withCredentials: true, // cookies
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    Authorization: `${localStorage.getItem("token")}`,
+    // Authorization: `${localStorage.getItem("token")}`,
   },
 });
 
@@ -25,8 +27,21 @@ export const APIAuthenticated = axios.create({
 APIAuthenticated.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+
+    // // Fallback: check cookie if no localStorage token
+    // if (!token) {
+    //   const tokenCookie = document.cookie
+    //     .split('; ')
+    //     .find(row => row.startsWith('token='));
+    //   if (tokenCookie) {
+    //     token = tokenCookie.split('=')[1];
+    //     localStorage.setItem("token", token); // sync to localStorage
+    //   }
+    // }
+
+    // Set Authorization header if token exists
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`; 
     }
     return config;
   },
@@ -35,4 +50,3 @@ APIAuthenticated.interceptors.request.use(
   },
 );
 
-// export { API, APIAuthenticated }

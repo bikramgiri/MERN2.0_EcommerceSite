@@ -14,6 +14,7 @@ import {
 } from "../../store/userFavouriteSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import Footer from "../../globals/components/Footer";
+import Navbar from "../../globals/components/Navbar";
 
 const Favourites = () => {
   const navigate = useNavigate();

@@ -9,7 +9,6 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
-  console.log("Auth Status:", status);
 
   const [message, setMessage] = useState("");
   const [userData, setUserData] = useState({

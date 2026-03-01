@@ -33,16 +33,16 @@ const Cart = () => {
   const shipping = 70;
   const total = subtotal + shipping;
 
-  if (status === Status.LOADING) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <Loader2 className="w-16 h-16 animate-spin text-indigo-700 mx-auto mb-4" />
-          <p className="text-xl text-gray-800">Loading your cart...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (status === Status.LOADING) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-white">
+  //       <div className="text-center">
+  //         <Loader2 className="w-16 h-16 animate-spin text-indigo-700 mx-auto mb-4" />
+  //         <p className="text-xl text-gray-800">Loading your cart...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (cartItems.length === 0) {
     return (
