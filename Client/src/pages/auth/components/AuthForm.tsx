@@ -212,11 +212,6 @@ const AuthForm = ({ type, onSubmit, onChange, values, errors, message, passwordS
             {/* Google */}
             <button
               onClick={() => {
-                // reomve token from localStorage before redirecting to Google OAuth to ensure clean state
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 window.open(google, "_self")
               }}
               className="cursor-pointer flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg py-3.5 px-4 shadow-sm hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"

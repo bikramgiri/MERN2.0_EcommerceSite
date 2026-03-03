@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import SingleProduct from './components/product/SingleProduct'; // adjust path
+import Review from './components/review/Review';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,7 +13,12 @@ const ProductDetails = () => {
     );
   }
 
-  return <SingleProduct productId={id} />;
+  return (
+    <>
+      <SingleProduct productId={id} />
+      <Review productId={id} />
+    </>
+  );
 };
 
 export default ProductDetails;

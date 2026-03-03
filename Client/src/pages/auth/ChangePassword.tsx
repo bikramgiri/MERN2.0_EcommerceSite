@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { Status } from "../../globals/statuses";
-import { changePassword } from "../../store/authSlice";
+import { changePassword, resetAuthStatus } from "../../store/authSlice";
 import { Loader2 } from "lucide-react";
 
 const ChangePassword = () => {
@@ -109,7 +109,6 @@ const ChangePassword = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({ email: "", otp: "", newPassword: "", confirmPassword: "", general: "" });
-    setMessage("");
 
     let hasError = false;
 
@@ -158,9 +157,9 @@ const ChangePassword = () => {
       .then(() => {
         setMessage("Password changed successfully!");
         setTimeout(() => {
-          setMessage("");
           navigate("/login");
         }, 2000);
+        dispatch(resetAuthStatus());
       })
       .catch((error) => {
         const errMsg =
@@ -172,6 +171,7 @@ const ChangePassword = () => {
         } else {
           setErrors((prev) => ({ ...prev, general: "Something went wrong. Please try again." }));
         }
+        dispatch(resetAuthStatus());
       });
   };
 

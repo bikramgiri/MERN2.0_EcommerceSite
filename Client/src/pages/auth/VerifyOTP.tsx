@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { verifyOTP } from "../../store/authSlice";
+import { resetAuthStatus, verifyOTP } from "../../store/authSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { Status } from "../../globals/statuses";
 import { Loader2 } from "lucide-react";
@@ -77,9 +77,9 @@ const VerifyOTP = () => {
       .then(() => {
         setMessage("OTP verified successfully!");
         setTimeout(() => {
-          setMessage("");
           navigate("/changepassword");
         }, 2000);
+        dispatch(resetAuthStatus());
       })
       .catch((error) => {
         const errMsg =

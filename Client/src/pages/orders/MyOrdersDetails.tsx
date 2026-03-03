@@ -7,8 +7,6 @@ import { ArrowLeft, Loader2, PenBoxIcon, Trash, X } from "lucide-react";
 import QRCode from "react-qr-code";
 import { APIAuthenticated } from "../../http";
 import { OrderStatus } from "../../globals/types/checkoutTypes";
-import Navbar from "../../globals/components/Navbar";
-import Footer from "../../globals/components/Footer";
 
 const MyOrdersDetails = () => {
   const navigate = useNavigate();
@@ -101,8 +99,6 @@ const MyOrdersDetails = () => {
   }
 
   return (
-    <>
-      <Navbar />
       <section className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen py-12 antialiased">
         <div className="mt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <button
@@ -366,8 +362,6 @@ const MyOrdersDetails = () => {
           </div>
         </div>
       </section>
-      <Footer />
-    </>
   );
 };
 

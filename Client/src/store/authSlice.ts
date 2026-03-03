@@ -75,12 +75,11 @@ const authSlice = createSlice({
     logOut: (state) => {
       state.user = {} as User;
       state.token = "";
-      // remove token from localStorage
       localStorage.removeItem("token");
-      localStorage.removeItem("userId");
       localStorage.removeItem("user");
-      // remove token from cookies (if stored there)
+      localStorage.removeItem("userId");
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       state.status = Status.IDLE;
     },
     resetAuth: (state) => {
@@ -88,11 +87,13 @@ const authSlice = createSlice({
       state.token = "";
       state.status = Status.IDLE;
       localStorage.removeItem("token");
-      // remove token from cookies (if stored there)
+      localStorage.removeItem("user");
+      localStorage.removeItem("userId");
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     },
     resetAuthStatus: (state: AuthState) => {
-      state.status = Status.LOADING;
+      state.status = Status.IDLE;
     },
     setEmail: (state: AuthState, action: PayloadAction<string>) => {
       state.email = action.payload;
@@ -215,20 +216,24 @@ export function handleGoogleLogin() {
         }
 
         // Optional: still verify with /profile (now should work)
-        const response = await APIAuthenticated.get('/profile');
-        console.log("Profile in google login handler:", response.data);
-        if (response.status === 200) {
-          const freshUser = response.data.data;
-          dispatch(setUser(freshUser));
-          localStorage.setItem('user', JSON.stringify(freshUser));
-        }
+        // const response = await APIAuthenticated.get('/profile');
+        // if (response.status === 200) {
+        //   const freshUser = response.data.data;
+        //   dispatch(setUser(freshUser));
+        //   localStorage.setItem('user', JSON.stringify(freshUser));
+        // }
+
+        // *Or
+        dispatch(fetchUserProfile());
 
         dispatch(setStatus(Status.SUCCESS));
 
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
-      } catch (err) {
-        console.error('Google login processing failed:', err);
+      } catch (error) {
+        console.error('Google login processing failed:', error);
+        dispatch(setStatus(Status.ERROR));
+        throw error;
       }
     }
   };

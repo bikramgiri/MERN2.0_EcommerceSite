@@ -96,7 +96,6 @@ const Navbar = () => {
 
   const handleLogOut = () => {
     dispatch(logOut());
-    localStorage.removeItem("token");
     setIsDropdownOpen(false);
     setIsOpen(false);
     navigate("/login?logout=true");

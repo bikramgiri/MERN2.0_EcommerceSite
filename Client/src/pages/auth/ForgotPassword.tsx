@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { forgotPassword } from "../../store/authSlice";
+import { forgotPassword, resetAuthStatus } from "../../store/authSlice";
 import { Status } from "../../globals/statuses";
 import { Loader2 } from "lucide-react";
 
@@ -55,9 +55,9 @@ const ForgotPassword = () => {
       .then(() => {
         setMessage("OTP sent to your email successfully!");
         setTimeout(() => {
-          setMessage("");
           navigate("/verifyotp");
         }, 2000);
+        dispatch(resetAuthStatus());
       })
       .catch((error) => {
         const errMsg =

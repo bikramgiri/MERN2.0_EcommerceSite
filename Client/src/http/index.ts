@@ -18,8 +18,9 @@ export const APIAuthenticated = axios.create({
   withCredentials: true, // cookies
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json",
-    // Authorization: `${localStorage.getItem("token")}`,
+    // "Content-Type": "multipart/form-data",
+    "Accept": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("token")}`,
   },
 });
 
@@ -43,6 +44,12 @@ APIAuthenticated.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; 
     }
+
+    // Let axios set Content-Type + boundary for FormData
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+    
     return config;
   },
   (error) => {

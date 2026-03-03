@@ -5,9 +5,6 @@ import { deleteMyOrders, fetchMyOrder } from "../../store/checkoutSlice";
 import { Status } from "../../globals/statuses";
 import { OrderStatus } from '../../globals/types/checkoutTypes';
 import { Search, Trash } from "lucide-react";
-import Navbar from "../../globals/components/Navbar";
-import Footer from "../../globals/components/Footer";
-
 const MyOrders = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -115,8 +112,6 @@ const searchedOrders = timeFilteredOrders.filter(
   }
 
   return (
-   <>
-   <Navbar />
     <section className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen py-12 antialiased">
       <div className="mt-8 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
              {message && (
@@ -307,8 +302,6 @@ const searchedOrders = timeFilteredOrders.filter(
         </div>
       </div>
     </section>
-   <Footer />
-   </>
   );
 };
 

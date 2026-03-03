@@ -4,8 +4,6 @@ import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { editMyOrders, fetchMySingleOrder } from "../../store/checkoutSlice";
 import { fetchProducts } from "../../store/productSlice";
 import { ArrowLeft, Minus, PenBoxIcon, Plus } from "lucide-react";
-import Navbar from "../../globals/components/Navbar";
-import Footer from "../../globals/components/Footer";
 import { PaymentMethod } from "../../globals/types/checkoutTypes";
 
 const EditMyOrders = () => {
@@ -170,8 +168,6 @@ const EditMyOrders = () => {
   }
 
   return (
-    <>
-      <Navbar />
       <div className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen py-12 antialiased">
         <div className="mt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <button
@@ -386,8 +382,6 @@ const EditMyOrders = () => {
           </div>
         </div>
       </div>
-      <Footer />
-    </>
   );
 };
 

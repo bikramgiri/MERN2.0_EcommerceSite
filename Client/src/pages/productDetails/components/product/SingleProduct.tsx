@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { Status } from "../../../../globals/statuses";
 import { AddToFavorite, removeFavorite } from "../../../../store/userFavouriteSlice";
 import { addToCart, updateCartItems } from "../../../../store/cartSlice";
-import Navbar from "../../../../globals/components/Navbar";
-import Footer from "../../../../globals/components/Footer";
 
 interface SingleProductProps {
   productId: string;
@@ -188,11 +186,8 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
   };
 
   return (
-    <>
-    <Navbar />
-    <section className="py-6 md:py-10 bg-gray-50 min-h-screen">
-      <div>
-        <div className="mt-10 ml-10">
+    <section className="py-8 md:py-8 bg-gray-50">
+        <div className="mt-10 ml-4 md:ml-9">
           <button
             onClick={() => navigate("/")} // or navigate("/") if you prefer home
             className="cursor-pointer group inline-flex items-center px-2 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-700 font-medium text-lg shadow-sm hover:shadow-md hover:border-indigo-400 hover:bg-indigo-50 transition-all duration-300"
@@ -222,7 +217,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
             </h1>
             {/* Price + Discount */}
             <div className="flex items-center gap-4 mb-6">
-              <span className="text-2xl md:text-2xl font-bold text-indigo-700">
+              <span className="text-2xl md:text-2xl font-bold text-blue-600">
                 Rs. {singleProduct.productPrice}
               </span>
               {singleProduct.oldPrice && (
@@ -231,47 +226,60 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
                 </span>
               )}
               {singleProduct.discount && (
-                <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">
+                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                   -{singleProduct.discount}%
                 </span>
               )}
             </div>
 
             {/* Rating */}
-            <div className="mb-6 flex gap-4 justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      className="w-6 h-6 text-yellow-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                  <p className="text-sm font-medium text-gray-600">
-                  (5.0) 
-                </p>
-                <p className="cursor-pointer text-sm font-medium leading-none text-gray-900 underline hover:underline">
-                    12 Reviews
-                  </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-md text-gray-800">Share:</span>
-                <button className="cursor-pointer text-blue-600 hover:text-blue-800">
-                  <Facebook className="w-6 h-6" />
-                </button>
-                <button className="cursor-pointer text-green-600 hover:text-green-800">
-                  <BsWhatsapp className="w-6 h-6" />
-                </button>
-                <button className="cursor-pointer text-blue-600 hover:text-blue-800">
-                  <BsMessenger className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+  {/* Left: Rating + Review Count */}
+  <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+    {/* Stars */}
+    <div className="flex items-center gap-1">
+      {[...Array(5)].map((_, i) => (
+        <svg
+          key={i}
+          className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-400"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ))}
+    </div>
+
+    {/* Rating Text */}
+    <p className="text-sm font-medium text-gray-600 whitespace-nowrap">
+      (5.0)
+    </p>
+
+    {/* Review Count (clickable) */}
+    <p className="cursor-pointer text-sm font-medium leading-none text-gray-900 underline hover:underline">
+      12 Reviews
+    </p>
+  </div>
+
+  {/* Right: Share Buttons */}
+  <div className="flex items-center gap-4 sm:gap-5">
+    <span className="text-md text-gray-800 whitespace-nowrap">Share:</span>
+
+    <div className="flex items-center gap-4 sm:gap-5">
+      <button className="cursor-pointer text-blue-600 hover:text-blue-800 transition-colors">
+        <Facebook className="w-6 h-6 sm:w-7 sm:h-7" />
+      </button>
+
+      <button className="cursor-pointer text-green-600 hover:text-green-800 transition-colors">
+        <BsWhatsapp className="w-6 h-6 sm:w-7 sm:h-7" />
+      </button>
+
+      <button className="cursor-pointer text-blue-600 hover:text-blue-800 transition-colors">
+        <BsMessenger className="w-6 h-6 sm:w-7 sm:h-7" />
+      </button>
+    </div>
+  </div>
+</div>
 
             <div className="block text-md font-medium text-gray-700 mb-8">
               Quantity: {singleProduct.productTotalStockQty}
@@ -331,7 +339,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={singleProduct.productTotalStockQty === 0}
-                className="cursor-pointer flex-1 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center rounded-xl px-8 py-4 text-base font-semibold text-white bg-indigo-700 hover:bg-indigo-800 transition-colors shadow-md"
+                className="cursor-pointer flex-1 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center rounded-xl px-8 py-4 text-base font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md"
               >
                 <svg
                   className="w-6 h-6 mr-3"
@@ -390,10 +398,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
             </div>
           </div>
         </div>
-      </div>
     </section>
-    <Footer />
-    </>
   );
 };
 

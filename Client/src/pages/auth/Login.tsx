@@ -177,7 +177,6 @@ const Login = () => {
       setTimeout(() => {
       setMessage("Login successful");
       setTimeout(() => {
-        setMessage("");
         navigate("/");
       }, 2000);
       }, 0);
@@ -199,7 +198,6 @@ const Login = () => {
       setTimeout(() => {
         setMessage("Logout successful");
         setTimeout(() => {
-          setMessage("");
           navigate("/login", { replace: true });
         }, 1000);
       }, 0); 

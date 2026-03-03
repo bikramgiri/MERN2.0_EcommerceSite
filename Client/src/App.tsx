@@ -16,6 +16,7 @@ import EditMyOrders from './pages/orders/EditMyOrders.js'
 import { useAppDispatch } from './hooks/hooks.js'
 import { useEffect } from 'react'
 import { handleGoogleLogin } from './store/authSlice.js'
+import Layout from './globals/components/Layout.js'
 
 function App() {
 
@@ -27,12 +28,8 @@ function App() {
   return (
     <BrowserRouter>
     <Routes>
+      <Route element={<Layout />}>
       <Route path="/" element={<Home />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/forgotpassword" element={<ForgotPassword />} />
-      <Route path="/verifyotp" element={<VerifyOTP />} />
-      <Route path="/changepassword" element={<ChangePassword />} />
       <Route path="/productdetails/:id" element={<ProductDetails />} />
       <Route path="/favorites" element={<Favourites />} />
       <Route path="/cart" element={<Cart />} />
@@ -40,6 +37,13 @@ function App() {
       <Route path="/myorders" element={<MyOrders />} />
       <Route path="/myorders/orderdetails/:id" element={<MyOrdersDetails />} />
       <Route path="/myorders/orderdetails/editorders/:id" element={<EditMyOrders />} />
+      </Route>
+
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/verifyotp" element={<VerifyOTP />} />
+      <Route path="/changepassword" element={<ChangePassword />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
