@@ -53,7 +53,6 @@ class authMiddleware {
       // }
 
       if (!token) {
-        console.log("No token provided in header or cookie");
         res.status(401).json({
           message: "No token provided",
         });

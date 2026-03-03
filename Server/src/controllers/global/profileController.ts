@@ -15,7 +15,7 @@ class ProfileController {
       }
 
       const profile = await User.findByPk(userId, {
-        attributes: { exclude: ["password", "otp", "otpGeneratedTime"] },
+        attributes: { exclude: ["password", "otp", "otpGeneratedTime", "googleId", "createdAt", "updatedAt"] },
       });
       if (!profile) {
         return res.status(404).json({

@@ -3,6 +3,7 @@ import Product from "../../../models/productModel";
 import User from "../../../models/userModel";
 import Order from "../../../models/orderModel";
 import Category from "../../../models/categoryModel";
+import Review from "../../../models/reviewModel";
 
 
 class DataService {
@@ -11,6 +12,7 @@ class DataService {
       const users = (await User.findAll({ where: { role: "customer" } })).length;
       const orders = (await Order.findAll()).length;
       const categories = (await Category.findAll()).length
+      const reviews = (await Review.findAll()).length
 
       const allProducts = await Product.findAll();
       const allUsers = await User.findAll({ where: { role: "customer" } });
@@ -23,6 +25,7 @@ class DataService {
             ]
       })
       const allCategories = await Category.findAll();
+      const allReviews = await Review.findAll();
 
       res.status(200).json({
             message: "Data fetched successfully",
@@ -31,10 +34,12 @@ class DataService {
                   users,
                   orders,
                   categories,
+                  reviews,
                   allProducts,
                   allUsers,
                   allOrders,
-                  allCategories
+                  allCategories,
+                  allReviews
             }
       });
   }

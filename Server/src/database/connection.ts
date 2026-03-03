@@ -7,6 +7,7 @@ import Order from "../models/orderModel";
 import OrderDetail from "../models/orderDetailsModel";
 import Payment from "../models/paymentModel";
 import UserFavorites from "../models/userFavoritesModel";
+import Review from "../models/reviewModel";
 
 const sequelize = new Sequelize({
   database: process.env.DB_NAME as string,
@@ -57,13 +58,18 @@ Product.belongsTo(User, { foreignKey: "userId" });
 Product.belongsTo(Category, { foreignKey: "categoryId" });
 Category.hasMany(Product, { foreignKey: "categoryId" });
 
+Review.belongsTo(Product, { foreignKey: "productId" });
+Product.hasMany(Review, { foreignKey: "productId" })
+
+Review.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Review, { foreignKey: "userId" })
+
 Cart.belongsTo(Product, { foreignKey: "productId" });
 Product.hasMany(Cart, { foreignKey: "productId" });
 
 Cart.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(Cart, { foreignKey: "userId" });
 
-// orderDetails and order  relationship
 OrderDetail.belongsTo(Order, { foreignKey: "orderId" });
 Order.hasMany(OrderDetail, { foreignKey: "orderId" });
 

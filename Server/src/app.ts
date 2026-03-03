@@ -49,6 +49,8 @@ import categoryController from './controllers/admin/category/categoryController'
 import dataServiceRoute from './routes/admin/dataServiceRoute';
 import adminUserRoutes from './routes/admin/adminUserRoutes';
 import profileRoutes from './routes/global/profileRoutes';
+import adminReviewRoutes from './routes/admin/adminReviewRoute';
+import reviewRoutes from './routes/user/reviewRoute';
 
 // *Give access to storage folder images
 app.use("/src/storage", express.static("storage")); // Serve static files from the storage directory
@@ -62,10 +64,12 @@ app.use('/admin', categoryRoute);
 app.use('/admin', adminOrderRoute);
 app.use('/admin', dataServiceRoute);
 app.use('/admin', adminUserRoutes);
+app.use('/admin', adminReviewRoutes);
 app.use('/', profileRoutes);
 app.use('/user', cartRoute);
 app.use('/user', userOrderRoute);
 app.use('/user', userRoute);
+app.use('/user', reviewRoutes);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {

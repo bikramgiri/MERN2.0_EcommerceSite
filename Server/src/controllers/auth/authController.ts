@@ -130,6 +130,7 @@ class AuthController {
   public static async logoutUser(req: Request, res: Response): Promise<void> {
     try {
       res.clearCookie("token");
+      res.clearCookie("user");
       res.status(200).json({
         message: "Logout successful",
       });
