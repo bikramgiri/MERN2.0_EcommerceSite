@@ -11,7 +11,7 @@ router.route('/review/:id')
 .post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), upload.single('reviewImage'), cloudinaryUpload, ReviewController.addReview)
 .get(catchAsyncError(ReviewController.getProductReviews))
 .patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), upload.single('reviewImage'), cloudinaryUpload, ReviewController.editReview)
-.delete(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), ReviewController.deleteReview);
+.delete(authMiddleware.isAuthenticated, ReviewController.deleteReview);
 
 router.route('/review')
 .get(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), catchAsyncError(ReviewController.getUserReviews));

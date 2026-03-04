@@ -417,11 +417,11 @@ class ReviewController {
         return;
       }
 
-      // Check if the review belongs to the authenticated user
-      if (review.userId !== userId) {
-        res.status(403).json({ message: "Forbidden: You can only delete your own reviews" });
-        return;
-      }
+      // // Check if the review belongs to the authenticated user
+      // if (review.userId !== userId) {
+      //   res.status(403).json({ message: "Forbidden: You can only delete your own reviews" });
+      //   return;
+      // }
 
       await review.destroy();
 

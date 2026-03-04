@@ -4,6 +4,7 @@ import User from "../../../models/userModel";
 import { AuthRequest } from "../../../middleware/authMiddleware";
 import Review from "../../../models/reviewModel";
 import getFullImageUrl from "../../../services/imageHandler";
+import Category from "../../../models/categoryModel";
 
 class  AdminReviewController {
 
@@ -18,6 +19,12 @@ class  AdminReviewController {
           {
             model: Product,
             attributes: ["id", "productName"],
+            include: [
+              {
+                model: Category,
+                attributes: ["id", "categoryName"],
+              },
+            ],
           },
           {
             model: User,
@@ -34,6 +41,7 @@ class  AdminReviewController {
           reviewImage: getFullImageUrl(plainReview.reviewImage),
         };
       });
+      reviewsWithFullImage.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       res.status(200).json({
         message: "All reviews fetched successfully",
