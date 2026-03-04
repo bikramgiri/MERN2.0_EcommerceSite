@@ -19,7 +19,7 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <Link to="/" className="inline-block mb-6">
               <h3 className="text-2xl md:text-3xl font-bold text-indigo-700 tracking-tight">
-                Ecommerce Hub
+                SajhaMart
               </h3>
             </Link>
 
@@ -124,7 +124,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
             <p>
-              © {new Date().getFullYear()} Ecommerce Hub. All rights reserved.
+              © {new Date().getFullYear()} SajhaMart. All rights reserved.
             </p>
 
             <div className="flex gap-6">

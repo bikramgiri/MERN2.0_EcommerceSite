@@ -140,7 +140,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <span className="text-2xl font-bold text-indigo-700 tracking-tight">
-              Ecommerce Hub
+              SajhaMart
             </span>
           </Link>
 

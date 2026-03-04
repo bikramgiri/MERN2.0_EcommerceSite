@@ -3,10 +3,9 @@ import {
   deleteReview,
   fetchProductReviews,
 } from "../../../../store/reviewSlice";
-import { Status } from "../../../../globals/statuses";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/hooks";
 import toast from "react-hot-toast";
-import { Edit, Loader2, PencilIcon, Trash2 } from "lucide-react";
+import { Edit, PencilIcon, Trash2 } from "lucide-react";
 import type { Review } from "../../../../globals/types/reviewTypes";
 import AddReview from "./AddReview";
 import EditReview from "./EditReview";
