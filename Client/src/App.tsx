@@ -17,9 +17,15 @@ import { useAppDispatch } from './hooks/hooks.js'
 import { useEffect } from 'react'
 import { handleGoogleLogin } from './store/authSlice.js'
 import Layout from './globals/components/Layout.js'
+import {io} from 'socket.io-client';
+
+export const socket = io('http://localhost:4000', {
+  auth: {
+    token: localStorage.getItem('token'),
+  },
+});
 
 function App() {
-
    const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(handleGoogleLogin());

@@ -55,7 +55,7 @@ const Product = () => {
         selectedBrands.length === 0 ||
         selectedBrands.includes(p.brand || "Unknown");
       const matchCategory =
-        categoryFilter === "all" || p.Category?.categoryName === categoryFilter;
+        categoryFilter === "all" || p.category?.categoryName === categoryFilter;
       const matchPrice =
         p.productPrice >= priceRange[0] && p.productPrice <= priceRange[1];
       const matchRating =

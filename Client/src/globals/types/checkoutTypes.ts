@@ -77,6 +77,7 @@ export interface OrderData {
 
 export interface SingleOrder{
       id: string;
+      userId: string;
       quantity: number;
       orderId: string;
       Product: Product;

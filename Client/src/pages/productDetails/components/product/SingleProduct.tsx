@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchSingleProduct } from "../../../../store/productSlice";
+import { fetchSingleProduct, updateSingleProductStockQty } from "../../../../store/productSlice";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/hooks";
 import { ArrowLeft, Facebook, Heart, Loader2, Minus, Plus} from "lucide-react";
 import { BsMessenger, BsWhatsapp } from "react-icons/bs";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Status } from "../../../../globals/statuses";
 import { AddToFavorite, removeFavorite } from "../../../../store/userFavouriteSlice";
 import { addToCart, updateCartItems } from "../../../../store/cartSlice";
+import { socket } from "../../../../App";
 
 interface SingleProductProps {
   productId: string;
@@ -27,6 +28,12 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
       console.error("Invalid product ID:", productId);
     }
   }, [dispatch, productId]);
+
+  // useEffect(() => {
+  //   socket.on("productStockChanged", (data) => {
+  //     dispatch(updateSingleProductStockQty(data));
+  //   });
+  // }, [dispatch]);
 
   // const handleQuantityChange = (type: "increase" | "decrease") => {
   //   if (type === "increase") {

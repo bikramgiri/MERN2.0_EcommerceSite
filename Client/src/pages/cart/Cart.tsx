@@ -1,15 +1,12 @@
-// Cart.tsx - Safe rendering with proper keys and fallbacks
-
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { removeFromCart, updateCartItems } from "../../store/cartSlice";
-import { ArrowLeft, Loader2, Minus, Plus, Trash } from "lucide-react";
-import { Status } from "../../globals/statuses";
+import { ArrowLeft, Minus, Plus, Trash } from "lucide-react";
 
 const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { items: cartItems = [], status } = useAppSelector((state) => state.cart);
+  const { items: cartItems = [] } = useAppSelector((state) => state.cart);
 
   const handleDeleteItem = (productId: string) => {
     dispatch(removeFromCart(productId));
@@ -42,9 +39,11 @@ const Cart = () => {
   //   );
   // }
 
-  if (cartItems.length === 0) {
-    return (
-      <section className="py-20 bg-white min-h-screen">
+
+  return (
+    <>
+    { !cartItems || cartItems.length === 0 ? (
+        <section className="py-20 bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold text-indigo-700 mb-6">Your Cart is Empty</h1>
           <p className="text-lg text-gray-700 mb-10">Looks like you haven't added anything yet.</p>
@@ -56,11 +55,8 @@ const Cart = () => {
           </Link>
         </div>
       </section>
-    );
-  }
-
-  return (
-    <section className=" py-8 md:py-12 bg-gray-50 pb-16 mt-9 md:pt-18">
+    ) : (
+       <section className=" py-8 md:py-12 bg-gray-50 pb-16 mt-9 md:pt-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="mt-2 mb-6 flex flex-col sm:flex-row items-center gap-1 sm:gap-6 md:gap-40 lg:gap-80">
@@ -276,6 +272,8 @@ const Cart = () => {
         </div>
       </div>
     </section>
+    )}
+    </>
   );
 };
 

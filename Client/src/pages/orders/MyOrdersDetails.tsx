@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { fetchMySingleOrder } from "../../store/checkoutSlice";
+import { fetchMySingleOrder, updateSingleOrderPaymentStatus, updateSingleOrderStatus } from "../../store/checkoutSlice";
 import { Status } from "../../globals/statuses";
 import { ArrowLeft, Loader2, PenBoxIcon, Trash, X } from "lucide-react";
 import QRCode from "react-qr-code";
 import { APIAuthenticated } from "../../http";
 import { OrderStatus } from "../../globals/types/checkoutTypes";
+import { socket } from "../../App";
 
 const MyOrdersDetails = () => {
   const navigate = useNavigate();
@@ -21,6 +22,18 @@ const MyOrdersDetails = () => {
       dispatch(fetchMySingleOrder(id));
     }
   }, [dispatch, id]);
+
+  useEffect(() => {
+    socket.on("orderStatusChanged", (data) => {
+        dispatch(updateSingleOrderStatus(data));
+    });
+  }, [dispatch]);
+
+  useEffect(() => {
+    socket.on("paymentStatusChanged", (data) => {
+        dispatch(updateSingleOrderPaymentStatus(data));
+    });
+  }, [dispatch]);
 
   const orderInfo = singleOrder?.[0]?.Order;
   const items = singleOrder || [];

@@ -7,26 +7,45 @@ import type { Product, ProductState } from "../globals/types/productTypes";
 const initialState: ProductState = {
   product: [],
   status: Status.LOADING,
-  singleProduct: null,
+  singleProduct: {} as Product,
 };
 
 const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {
-      setProducts: (state: ProductState, action: PayloadAction<Product[]>) => {
-          state.product = action.payload;
-      },
-      setStatus: (state: ProductState, action: PayloadAction<Status>) => {
-          state.status = action.payload;
-      },
-      setSingleProduct: (state: ProductState, action: PayloadAction<Product>) => {
-          state.singleProduct = action.payload;
-      },
+    setProducts: (state: ProductState, action: PayloadAction<Product[]>) => {
+      state.product = action.payload;
     },
+    setStatus: (state: ProductState, action: PayloadAction<Status>) => {
+      state.status = action.payload;
+    },
+    setSingleProduct: (state: ProductState, action: PayloadAction<Product>) => {
+      state.singleProduct = action.payload;
+    },
+    updateSingleProductStockQty(
+      state: ProductState,
+      action: PayloadAction<{ productId: string; newStockQty: number }>,
+    ) {
+      const { productId, newStockQty } = action.payload;
+      if (state.singleProduct?.id === productId) {
+        state.singleProduct = {
+          ...state.singleProduct,
+          productTotalStockQty: newStockQty, 
+        };
+      }
+
+      // Optional: also update in the products list (if you want consistency)
+      state.product = state.product.map((product) =>
+        product.id === productId
+          ? { ...product, productTotalStockQty: newStockQty }
+          : product,
+      );
+    },
+  },
 });
 
-export const { setProducts, setStatus, setSingleProduct } = productSlice.actions
+export const { setProducts, setStatus, setSingleProduct, updateSingleProductStockQty } = productSlice.actions
 export default productSlice.reducer
 
 export function fetchProducts(){
