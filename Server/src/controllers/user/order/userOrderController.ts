@@ -175,7 +175,6 @@ class UserOrderController {
             },
           }
         );
-        console.log("Response from Khalti:", response);
         const khaltiResponse: KhaltiResponse = response.data;
         paymentData.pidx = khaltiResponse.pidx;
         await paymentData.save();
