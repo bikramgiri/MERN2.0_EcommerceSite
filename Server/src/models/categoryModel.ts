@@ -26,6 +26,12 @@ class Category extends Model {
       declare categoryName : string;
 
       @Column({
+            type : DataType.STRING,
+            allowNull : false
+      })
+      declare image : string;
+
+      @Column({
             type : DataType.TEXT,
             allowNull : false
       })

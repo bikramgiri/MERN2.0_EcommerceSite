@@ -420,6 +420,24 @@ private static readonly CLOUDINARY_BASE_URL =
 
       // const finalName = productImage.split('/').pop() || '';
 
+         // Remove Existing images
+    if (req.body.productImageToRemove) {
+      let productImageToRemove = req.body.productImageToRemove;
+      if (typeof productImageToRemove === "string") productImageToRemove = JSON.parse(productImageToRemove);
+
+      // Delete from Cloudinary
+      if (productImageToRemove.length > 0) {
+        const publicIds = productImageToRemove.map((filename: string) => {
+          const withoutExt = filename.replace(/\.[^/.]+$/, "");
+          return `Mern2_Ecommerce_Website/${withoutExt}`;
+        });
+        await cloudinary.uploader.destroy(publicIds, { resource_type: "image", invalidate: true });
+      }
+
+      // Remove from DB productImage
+      await product.update({ productImage: null });
+    }
+
       const updatedProduct = await product.update({
         productName: productName || product.productName,
         productImage: fileName,
