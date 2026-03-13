@@ -1,7 +1,6 @@
 import { Response } from "express";
 import Product from "../../../models/productModel";
 import User from "../../../models/userModel";
-import { AuthRequest } from "../../../middleware/authMiddleware";
 import Review from "../../../models/reviewModel";
 import getFullImageUrl from "../../../services/imageHandler";
 import Category from "../../../models/categoryModel";
@@ -10,7 +9,7 @@ class  AdminReviewController {
 
   // Fetch all reviews
   public static async getAllReviews(
-    req: AuthRequest,
+    req: Request,
     res: Response,
   ): Promise<void> {
     try {

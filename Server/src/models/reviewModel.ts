@@ -52,7 +52,7 @@ class Review extends Model {
   declare message: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.FLOAT,
     allowNull: false,
     validate: {
       min: {

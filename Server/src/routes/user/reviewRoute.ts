@@ -7,6 +7,9 @@ import { cloudinaryUpload } from '../../cloudinary';
 
 const router:Router = express.Router();
 
+router.route('/reviews')
+.get(catchAsyncError(ReviewController.fetchAllReviews));
+
 router.route('/review/:id')
 .post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), upload.single('reviewImage'), cloudinaryUpload, ReviewController.addReview)
 .get(catchAsyncError(ReviewController.getProductReviews))
