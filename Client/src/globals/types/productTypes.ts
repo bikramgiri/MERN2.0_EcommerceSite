@@ -37,3 +37,17 @@ export interface ProductState{
       status: string,
       singleProduct: Product | null
 }
+
+
+export interface FilterOptions {
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+}
+
+export const SORT_OPTIONS = [
+  { value: 'relevance', label: 'Relevance', icon: 'Sparkles' },
+  { value: 'price_asc', label: 'Price: Low to High', icon: 'ArrowUp' },
+  { value: 'price_desc', label: 'Price: High to Low', icon: 'ArrowDown' },
+  { value: 'rating', label: 'Highest Rated', icon: 'Star' },
+] as const;

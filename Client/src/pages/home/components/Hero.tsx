@@ -4,33 +4,41 @@ import { Link } from "react-router-dom";
 import { Autoplay, EffectFade, Pagination, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import "swiper/css/bundle";
+import "swiper/swiper-bundle.css";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const Hero = () => {
   const heroSlides = [
     {
-      title: "Travel Anywhere, Anytime",
-      subtitle: "Book bus, train, launch & flight tickets with ease",
-      image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1920",
-      gradient: "from-blue-900/80 to-purple-900/80",
+      title: "Latest Electronics",
+      subtitle: "Chargers, bulbs & more at great prices",
+      // image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1920",
+      image: "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1920",
+      gradient: "from-blue-900/80 to-indigo-900/80",
     },
     {
-      title: "Explore New Destinations",
-      subtitle: "Discover amazing places with affordable tickets",
-      image: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=1920",
-      gradient: "from-green-900/80 to-blue-900/80",
+      title: "Trendy Fashion",
+      subtitle: "Caps, clothes & accessories for every style",
+      // image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920",
+      image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1920",
+      gradient: "from-purple-900/80 to-pink-900/80",
     },
     {
-      title: "Safe & Comfortable Journey",
-      subtitle: "Travel with trusted vendors and premium services",
-      image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920",
-      gradient: "from-orange-900/80 to-red-900/80",
+      title: "Home & Kitchen Essentials",
+      subtitle: "Everything you need for your home",
+      image:"https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1920",
+      gradient: "from-amber-900/80 to-orange-900/80",
+    },
+     {
+      title: "Stationery & Office Supplies",
+      subtitle: "Pens, notebooks & more for work & study",
+      image: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=1920",
+      gradient: "from-green-900/80 to-teal-900/80",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className=" bg-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50 pt-14 pb-16 md:pt-16">
         <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
@@ -42,6 +50,10 @@ const Hero = () => {
                 <span className="text-indigo-700">love</span>
               </h1>
 
+              <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed">
+                Shop electronics, fashion, kitchen essentials, stationery & more — all in one place.
+              </p>
+
               <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   to="/products"
@@ -51,10 +63,10 @@ const Hero = () => {
                 </Link>
 
                 <Link
-                  to="/deals"
+                  to="/products"
                   className="inline-flex items-center justify-center px-6 py-3 border-2 border-indigo-600 text-indigo-700 font-medium rounded-xl hover:bg-indigo-50 transition-all duration-200 text-base sm:text-lg"
                 >
-                  Today's Deals
+                  Browse Categories
                 </Link>
               </div>
 
@@ -66,6 +78,12 @@ const Hero = () => {
                     "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
                     "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
                     "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100",
+
+                    // "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=100",
+                    // "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=100",
+                    // "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=100",
+                    // "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=100",
+                    // "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=100",
                   ].map((src, i) => (
                     <img
                       key={i}
@@ -102,7 +120,7 @@ const Hero = () => {
               <Swiper
                 modules={[Autoplay, Pagination, EffectFade, Navigation]}
                 effect="fade"
-                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                autoplay={{ delay: 2000, disableOnInteraction: false }}
                 pagination={{ clickable: true, dynamicBullets: true }}
                 navigation={{
                   nextEl: ".custom-swiper-next",  
@@ -135,24 +153,6 @@ const Hero = () => {
                 </div>
               </Swiper>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick value proposition bar */}
-      <section className="py-10 md:py-12 bg-indigo-50">
-        <div className="max-w-7xl mx-auto px-5 grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 text-center">
-          <div>
-            <h3 className="text-lg sm:text-xl font-semibold text-indigo-900">Free Shipping</h3>
-            <p className="mt-2 text-gray-600 text-sm sm:text-base">On orders over $50</p>
-          </div>
-          <div>
-            <h3 className="text-lg sm:text-xl font-semibold text-indigo-900">Easy Returns</h3>
-            <p className="mt-2 text-gray-600 text-sm sm:text-base">30-day hassle-free policy</p>
-          </div>
-          <div>
-            <h3 className="text-lg sm:text-xl font-semibold text-indigo-900">24/7 Support</h3>
-            <p className="mt-2 text-gray-600 text-sm sm:text-base">Always here to help</p>
           </div>
         </div>
       </section>

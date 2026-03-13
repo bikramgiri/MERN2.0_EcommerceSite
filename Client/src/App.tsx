@@ -18,6 +18,7 @@ import { useEffect } from 'react'
 import { handleGoogleLogin } from './store/authSlice.js'
 import Layout from './globals/components/Layout.js'
 import {io} from 'socket.io-client';
+import Products from './pages/products/Products.js'
 
 export const socket = io('http://localhost:4000', {
   auth: {
@@ -43,6 +44,7 @@ function App() {
       <Route path="/myorders" element={<MyOrders />} />
       <Route path="/myorders/orderdetails/:id" element={<MyOrdersDetails />} />
       <Route path="/myorders/orderdetails/editorders/:id" element={<EditMyOrders />} />
+      <Route path="/products" element={<Products />} />
       </Route>
 
       <Route path="/register" element={<Register />} />

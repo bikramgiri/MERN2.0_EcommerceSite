@@ -41,6 +41,21 @@ const reviewSlice = createSlice({
 export const { setReviews, setStatus, editReview, deleteReviewById, setUserReviews, addReviews } = reviewSlice.actions
 export default reviewSlice.reducer
 
+// fetch all reviews of a product
+export function fetchAllReviews(){
+      return async function fetchAllReviewsThunk(dispatch: AppDispatch) {
+        dispatch(setStatus(Status.LOADING));
+            try {
+                  const response = await API.get('/user/reviews');
+                  dispatch(setReviews(response.data.data));
+                  dispatch(setStatus(Status.SUCCESS));
+            } catch (error) {
+                  dispatch(setStatus(Status.ERROR));
+                  throw error;
+            }
+      }
+}
+
 // fetch single product reviews
 export function fetchProductReviews(productId: string){
       return async function fetchProductReviewsThunk(dispatch: AppDispatch) {

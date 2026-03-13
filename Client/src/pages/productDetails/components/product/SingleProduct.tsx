@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchSingleProduct, updateSingleProductStockQty } from "../../../../store/productSlice";
+import { fetchSingleProduct } from "../../../../store/productSlice";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/hooks";
 import { ArrowLeft, Facebook, Heart, Loader2, Minus, Plus} from "lucide-react";
 import { BsMessenger, BsWhatsapp } from "react-icons/bs";
@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Status } from "../../../../globals/statuses";
 import { AddToFavorite, removeFavorite } from "../../../../store/userFavouriteSlice";
 import { addToCart, updateCartItems } from "../../../../store/cartSlice";
-import { socket } from "../../../../App";
+// import { socket } from "../../../../App";
 
 interface SingleProductProps {
   productId: string;
@@ -196,7 +196,7 @@ const SingleProduct = ({ productId }: SingleProductProps) => {
     <section className="py-8 md:py-8 bg-gray-50">
         <div className="mt-10 ml-4 md:ml-9">
           <button
-            onClick={() => navigate("/")} // or navigate("/") if you prefer home
+            onClick={() => navigate("/products")}
             className="cursor-pointer group inline-flex items-center px-2 py-2 bg-white border border-indigo-200 rounded-xl text-indigo-700 font-medium text-lg shadow-sm hover:shadow-md hover:border-indigo-400 hover:bg-indigo-50 transition-all duration-300"
           >
             <ArrowLeft className="w-5 h-5 text-indigo-700" />
