@@ -45,17 +45,14 @@ import { Status } from "../../../globals/statuses";
 // ];
 
 const Categories = () => {
-
-      //   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { categories, status } = useAppSelector((state) => state.category);
-  console.log("Categories from Redux:", categories);
 
   useEffect(() => {
-      dispatch(fetchCategories());
+    dispatch(fetchCategories());
   }, [dispatch]);
 
-    if (status === Status.LOADING) {
+  if (status === Status.LOADING) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50">
         <div className="text-center">
@@ -69,13 +66,9 @@ const Categories = () => {
   return (
     <section className="bg-white py-4 md:py-5">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
-        {/* <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-4">
+        <h1 className="text-3xl font-bold text-indigo-900 md:text-3xl mb-4">
           Categories
-        </h2> */}
-         <h1 className="text-3xl font-bold text-indigo-900 md:text-3xl mb-4">
-             Categories
-          </h1>
+        </h1>
 
         {/* Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -83,15 +76,14 @@ const Categories = () => {
             <Link
               to={`/products?category=${category.id}`}
               key={category.id}
-            className="group flex flex-col items-center rounded-sm bg-gray-50 p-4 transition-all duration-200 hover:-translate-y-1
-                             shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
+              className="group flex flex-col items-center rounded-sm bg-gray-50 p-4 transition-all duration-200 hover:-translate-y-1
+                shadow-[0_-4px_25px_-8px_rgba(0,0,0,0.6),0_3px_20px_-8px_rgba(0,0,0,0.04)]
                 dark:shadow-[0_-2px_34px_-14px_rgba(0,0,0,0.2),0_2px_14px_-8px_rgba(0,0,0,0.20)]
                 hover:shadow-[0_-6px_26px_-6px_rgba(0,0,0,0.6),0_8px_16px_-6px_rgba(0,0,0,0.1)]
                 dark:hover:shadow-[0_-8px_36px_-6px_rgba(0,0,0,0.12),0_6px_12px_-2px_rgba(0,0,0,0.14)]
                 transition-shadow duration-500
                 "
             >
-                  
               {/* Image */}
               <div className="w-full h-36 flex items-center justify-center overflow-hidden mb-3">
                 <img

@@ -27,7 +27,6 @@ import { addToCart } from "../../store/cartSlice";
 import { Status } from "../../globals/statuses";
 import { fetchAllReviews } from "../../store/reviewSlice";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const SORT_OPTIONS = [
   { value: "relevance", label: "Relevance" },
   { value: "newest", label: "Newest First" },
@@ -39,7 +38,6 @@ const SORT_OPTIONS = [
 
 const ITEMS_PER_PAGE = 8;
 
-// ─── Star component ───────────────────────────────────────────────────────────
 const Stars = ({ rating, count }: { rating: string; count?: number }) => (
   <div className="flex items-center gap-1">
     <div className="flex">
@@ -63,7 +61,6 @@ const Stars = ({ rating, count }: { rating: string; count?: number }) => (
   </div>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function Products() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -76,7 +73,6 @@ export default function Products() {
     (state) => state.favorite
   );
 
-  // ── State ──
   const [filters, setFilters] = useState<FilterOptions>({});
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [searchParams] = useSearchParams();
@@ -85,29 +81,26 @@ export default function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // ── Fetch ──
   useEffect(() => {
     dispatch(fetchProducts());
       dispatch(fetchAllReviews());
-  }, [dispatch]); // Fetch products on mount and when product list changes
+  }, [dispatch]); 
 
   useEffect(() => {
   const cat = searchParams.get("category");
   if (cat) {
     setTimeout(() => {
       setCategoryFilter(cat);
-    }, 100); // Add a small delay to ensure state updates correctly
+    }, 100); 
   }
 }, [searchParams]);
 
-  // ── Reset page on filter change ──
   useEffect(() => {
     setTimeout(() => {
       setCurrentPage(1);
-    }, 100); // Add a small delay to ensure state updates correctly
+    }, 100);
   }, [filters, categoryFilter, sortBy, searchQuery]);
 
-  // ── Computed products ──
   const processedProducts = useMemo(() => {
     let result = allProducts.filter((p) =>
       p.productName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -148,7 +141,6 @@ export default function Products() {
     setSearchQuery("");
   };
 
-  // ── Loading ──
   if (status === Status.LOADING && allProducts.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
