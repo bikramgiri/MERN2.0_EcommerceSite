@@ -48,8 +48,9 @@ const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") 
 const initialState: AuthState = {
   user : storedUser ? JSON.parse(storedUser) : {} as User,
   status: Status.IDLE,
-  token: "",
+  // token: "",
   // token: localStorage.getItem("token") || "", // Load on init
+  token: typeof window !== "undefined" ? localStorage.getItem("token") ?? "" : "",
   email: ""
 };
 
@@ -85,6 +86,7 @@ const authSlice = createSlice({
     resetAuth: (state) => {
       state.user = {} as User;
       state.token = "";
+      state.email = "";
       state.status = Status.IDLE;
       localStorage.removeItem("token");
       localStorage.removeItem("user");
