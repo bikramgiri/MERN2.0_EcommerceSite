@@ -6,7 +6,7 @@ import Category from "../../../models/categoryModel";
 import Review from "../../../models/reviewModel";
 
 
-class DataService {
+class DashboardController {
   async getDatas(req: Request, res: Response) {
       const products = (await Product.findAll()).length;
       const users = (await User.findAll({ where: { role: "customer" } })).length;
@@ -45,4 +45,4 @@ class DataService {
   }
 }
 
-export default new DataService();
+export default new DashboardController();

@@ -407,6 +407,7 @@ class UserOrderController {
         return;
       }
 
+      // Check stock availability
       if (item.quantity > product.productTotalStockQty) {
         res.status(400).json({
           message: `Only ${product.productTotalStockQty} units available for ${product.productName}.`,

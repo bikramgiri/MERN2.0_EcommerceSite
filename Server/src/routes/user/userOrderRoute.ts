@@ -6,17 +6,17 @@ const router:Router = express.Router();
 
 router.route('/order')
 .post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), userOrderController.createOrder)
-.get(authMiddleware.isAuthenticated, catchAsyncError(userOrderController.fetchMyOrders));
+.get(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), catchAsyncError(userOrderController.fetchMyOrders));
 
 router.route('/order/:id')
 .patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), userOrderController.updateOrder)
-.get(authMiddleware.isAuthenticated, userOrderController.fetchSingleOrder)
+.get(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), userOrderController.fetchSingleOrder)
 .delete(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), userOrderController.deleteMyOrder);
 
 router.route('/order/cancel/:id')
 .patch(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), userOrderController.cancelMyOrder)
 
 router.route('/paymentverify')
-.post(authMiddleware.isAuthenticated, catchAsyncError(userOrderController.paymentVerify));
+.post(authMiddleware.isAuthenticated, authMiddleware.authorizeRole(Role.Customer), catchAsyncError(userOrderController.paymentVerify));
 
 export default router;

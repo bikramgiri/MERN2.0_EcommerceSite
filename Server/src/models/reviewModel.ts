@@ -38,16 +38,12 @@ class Review extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    validate: {
-      min: {
-        args: [5],
-        msg: "Review must be at least 5 characters long.",
-      },
-      max: {
-        args: [100],
-        msg: "Review must be at most 100 characters long.",
-      },
-    },
+   validate: {
+  len: {
+    args: [5, 100],
+    msg: "Review must be between 5 and 100 characters.",
+  },
+},
   })
   declare message: string;
 
